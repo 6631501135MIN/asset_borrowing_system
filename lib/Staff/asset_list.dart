@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'assetdetailpage.dart';
+import 'addasset.dart';
 
 class Asset {
   final String name;
@@ -173,7 +174,12 @@ class _Asset_listState extends State<Asset_list> {
         children: [
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddAsset()),
+          );
+              },
               icon: const Icon(Icons.add, color: Colors.white),
               label: const Text(
                 'Add Assets',

@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
-import 'assetdetailpage.dart';
+import 'asset_list.dart';
 
-class EditAsset extends StatefulWidget {
-  const EditAsset({super.key});
+class AddAsset extends StatefulWidget {
+  const AddAsset({super.key});
 
   @override
-  State<EditAsset> createState() => _EditAssetState();
+  State<AddAsset> createState() => _AddAssetState();
 }
 
 const Color primaryDarkBlue = Color(0xFF0C1851);
 
-class _EditAssetState extends State<EditAsset> {
+class _AddAssetState extends State<AddAsset> {
   int _selectedIndex = 0;
   int? _selectedIconGroup = 1;
-
-  // (ฟังก์ชัน _buildAppBar, _buildNavItem, _buildBottomNavigationBar,
-  // _buildTextField, _buildIconSelector... ทั้งหมดเหมือนเดิม)
 
   AppBar _buildAppBar() {
     return AppBar(
@@ -27,13 +24,13 @@ class _EditAssetState extends State<EditAsset> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Hello Staff!',
+            'Hello John Smith!',
             style: TextStyle(color: Colors.white, fontSize: 16),
           ),
           const SizedBox(height: 5),
           Center(
             child: const Text(
-              'Edit Assets',
+              'Add Assets',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -175,60 +172,36 @@ class _EditAssetState extends State<EditAsset> {
                       children: [
                         Row(
                           children: [
-                            Image.asset(
-                              'asset/images/MacBook.png',
-                              color: Colors.white,
-                              width: 50,
-                              height: 50,
-                            ),
-                            SizedBox(width: 12),
-                            Text(
-                              'Macbook Air M3',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 24),
-                        
-                        // --- vvvvvvv MODIFIED vvvvvvv ---
-                        // 1. เปลี่ยน Rename เป็น Row + SizedBox
-                        Row(
-                          children: [
                             SizedBox(
                               width: 80,
                               child: const Text(
-                                'Rename',
-                                style: TextStyle(color: Colors.white, fontSize: 20),
+                                'Name',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 10),
-                            SizedBox(
-                              width: 250, // <-- กำหนดความกว้างที่นี่
-                              child: _buildTextField()
-                            ),
+                            SizedBox(width: 250, child: _buildTextField()),
                           ],
                         ),
                         SizedBox(height: 16),
 
-                        // 2. เปลี่ยน ID เป็น Row + SizedBox
                         Row(
                           children: [
                             SizedBox(
                               width: 80,
                               child: const Text(
                                 'ID',
-                                style: TextStyle(color: Colors.white, fontSize: 20),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 10),
-                            SizedBox(
-                              width: 200, 
-                              child: _buildTextField()
-                            ),
+                            SizedBox(width: 200, child: _buildTextField()),
                           ],
                         ),
                         const SizedBox(height: 24),
@@ -266,7 +239,12 @@ class _EditAssetState extends State<EditAsset> {
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(255, 0, 145, 29),
+                                backgroundColor: Color.fromARGB(
+                                  255,
+                                  0,
+                                  145,
+                                  29,
+                                ),
                                 fixedSize: Size(120, 44),
                               ),
                             ),
@@ -275,8 +253,7 @@ class _EditAssetState extends State<EditAsset> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        const AssetDetailPage(),
+                                    builder: (context) => const Asset_list(),
                                   ),
                                 );
                               },
@@ -288,7 +265,7 @@ class _EditAssetState extends State<EditAsset> {
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(255, 163, 0, 0),
+                                backgroundColor: Color.fromARGB(255, 163, 0, 0),
                                 fixedSize: Size(120, 44),
                               ),
                             ),
