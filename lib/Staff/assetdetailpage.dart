@@ -255,13 +255,24 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
       backgroundColor: primaryDarkBlue,
       appBar: _buildAppBar(),
 
-      bottomNavigationBar: BottomNavigationBar(
+ bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
         selectedItemColor: primaryDarkBlue,
         unselectedItemColor: Colors.grey,
         currentIndex: _selectedIndex,
         onTap: (index) {
+           if (index == 0) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Asset_list()),
+            (Route<dynamic> route) => false, 
+          );
+        } else {
+          setState(() {
+            _selectedIndex = index;
+          });
+        }
           setState(() {
             _selectedIndex = index;
           });
@@ -272,7 +283,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
           _buildNavItem('Home', 'asset/images/Home.png'),
           _buildNavItem('Profile', 'asset/images/User.png'),
         ],
-      ),
+ ),
 
       body: Column(
         children: [

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'assetdetailpage.dart';
+import 'asset_list.dart';
 
 class EditAsset extends StatefulWidget {
   const EditAsset({super.key});
@@ -14,8 +15,6 @@ class _EditAssetState extends State<EditAsset> {
   int _selectedIndex = 0;
   int? _selectedIconGroup = 1;
 
-  // (ฟังก์ชัน _buildAppBar, _buildNavItem, _buildBottomNavigationBar,
-  // _buildTextField, _buildIconSelector... ทั้งหมดเหมือนเดิม)
 
   AppBar _buildAppBar() {
     return AppBar(
@@ -77,9 +76,17 @@ class _EditAssetState extends State<EditAsset> {
       unselectedItemColor: Colors.grey,
       currentIndex: _selectedIndex,
       onTap: (index) {
-        setState(() {
-          _selectedIndex = index;
-        });
+        if (index == 0) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Asset_list()),
+            (Route<dynamic> route) => false, 
+          );
+        } else {
+          setState(() {
+            _selectedIndex = index;
+          });
+        }
       },
       items: [
         _buildNavItem('Assets', 'asset/images/Asset.png'),
@@ -193,9 +200,6 @@ class _EditAssetState extends State<EditAsset> {
                           ],
                         ),
                         SizedBox(height: 24),
-                        
-                        // --- vvvvvvv MODIFIED vvvvvvv ---
-                        // 1. เปลี่ยน Rename เป็น Row + SizedBox
                         Row(
                           children: [
                             SizedBox(
@@ -207,14 +211,13 @@ class _EditAssetState extends State<EditAsset> {
                             ),
                             const SizedBox(width: 10),
                             SizedBox(
-                              width: 250, // <-- กำหนดความกว้างที่นี่
+                              width: 250, 
                               child: _buildTextField()
                             ),
                           ],
                         ),
                         SizedBox(height: 16),
 
-                        // 2. เปลี่ยน ID เป็น Row + SizedBox
                         Row(
                           children: [
                             SizedBox(

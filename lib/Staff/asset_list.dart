@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'assetdetailpage.dart';
 import 'addasset.dart';
+import 'returnasset.dart'; 
 
 class Asset {
   final String name;
@@ -176,9 +177,9 @@ class _Asset_listState extends State<Asset_list> {
             child: ElevatedButton.icon(
               onPressed: () {
                 Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddAsset()),
-          );
+                  context,
+                  MaterialPageRoute(builder: (context) => const AddAsset()),
+                );
               },
               icon: const Icon(Icons.add, color: Colors.white),
               label: const Text(
@@ -198,7 +199,12 @@ class _Asset_listState extends State<Asset_list> {
           const SizedBox(width: 15),
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const GetReturnAssetsPage()),
+                );
+              },
               child: const Text(
                 'Get return Assets',
                 style: TextStyle(color: Colors.white, fontSize: 16),
@@ -246,7 +252,7 @@ class _Asset_listState extends State<Asset_list> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Hello John Smith!',
+              'Hello Staff!',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
             const SizedBox(height: 5),
@@ -277,6 +283,17 @@ class _Asset_listState extends State<Asset_list> {
         unselectedItemColor: Colors.grey,
         currentIndex: _selectedIndex,
         onTap: (index) {
+           if (index == 0) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Asset_list()),
+            (Route<dynamic> route) => false, 
+          );
+        } else {
+          setState(() {
+            _selectedIndex = index;
+          });
+        }
           setState(() {
             _selectedIndex = index;
           });
@@ -309,8 +326,8 @@ class _Asset_listState extends State<Asset_list> {
                       child: ListView.builder(
                         itemCount:
                             _filteredAssets.isEmpty && _searchQuery.isNotEmpty
-                            ? 1
-                            : _filteredAssets.length,
+                                ? 1
+                                : _filteredAssets.length,
                         itemBuilder: (context, index) {
                           if (_filteredAssets.isEmpty &&
                               _searchController.text.isNotEmpty) {

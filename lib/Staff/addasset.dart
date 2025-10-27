@@ -24,7 +24,7 @@ class _AddAssetState extends State<AddAsset> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Hello John Smith!',
+            'Hello Staff!',
             style: TextStyle(color: Colors.white, fontSize: 16),
           ),
           const SizedBox(height: 5),
@@ -50,7 +50,7 @@ class _AddAssetState extends State<AddAsset> {
     );
   }
 
-  BottomNavigationBarItem _buildNavItem(String label, String imagePath) {
+   BottomNavigationBarItem _buildNavItem(String label, String imagePath) {
     final navItems = ['Assets', 'History', 'Home', 'Profile'];
     final currentLabel = navItems[_selectedIndex];
     bool isSelected = label == currentLabel;
@@ -74,9 +74,17 @@ class _AddAssetState extends State<AddAsset> {
       unselectedItemColor: Colors.grey,
       currentIndex: _selectedIndex,
       onTap: (index) {
-        setState(() {
-          _selectedIndex = index;
-        });
+        if (index == 0) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Asset_list()),
+            (Route<dynamic> route) => false, 
+          );
+        } else {
+          setState(() {
+            _selectedIndex = index;
+          });
+        }
       },
       items: [
         _buildNavItem('Assets', 'asset/images/Asset.png'),
