@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
+import 'editasset.dart';
+import 'asset_list.dart';
 
-// --- Data Model (เหมือนเดิม) ---
 class SpecificAsset {
   final String name;
   final String id;
   final String status;
 
-  SpecificAsset({
-    required this.name,
-    required this.id,
-    required this.status,
-  });
+  SpecificAsset({required this.name, required this.id, required this.status});
 }
 
 class AssetDetailPage extends StatefulWidget {
@@ -23,7 +20,7 @@ class AssetDetailPage extends StatefulWidget {
 const Color primaryDarkBlue = Color(0xFF0C1851);
 
 class _AssetDetailPageState extends State<AssetDetailPage> {
-  int _selectedIndex = 0; 
+  int _selectedIndex = 0;
 
   final List<SpecificAsset> _assets = [
     SpecificAsset(name: 'Macbook Pro M1', id: 'Mac-1', status: 'Available'),
@@ -32,25 +29,23 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
     SpecificAsset(name: 'Macbook Air M2', id: 'Mac-4', status: 'Borrowed'),
   ];
 
-  // --- vvvvvvv MODIFIED FUNCTION vvvvvvv ---
-  // 1. นำ Title, centerTitle, และ toolbarHeight กลับมา
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: primaryDarkBlue,
       elevation: 0,
-      automaticallyImplyLeading: false, 
-      centerTitle: false, // กลับมาเป็น false
-      title: Column( // กลับมาใช้ Column
+      automaticallyImplyLeading: false,
+      centerTitle: false,
+      title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Hello Staff!', // ชื่อกลับมาแล้ว
+            'Hello Staff!',
             style: TextStyle(color: Colors.white, fontSize: 16),
           ),
           const SizedBox(height: 5),
           Center(
             child: const Text(
-              'Manage Asset List', // หัวข้อกลับมาแล้ว
+              'Manage Asset List',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -66,10 +61,9 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
           child: Icon(Icons.notifications, color: Colors.white),
         ),
       ],
-      toolbarHeight: 100, // ความสูงกลับมาแล้ว
+      toolbarHeight: 100,
     );
   }
-  // --- ^^^^^^^ MODIFIED FUNCTION ^^^^^^^ ---
 
   BottomNavigationBarItem _buildNavItem(String label, String imagePath) {
     final navItems = ['Assets', 'History', 'Home', 'Profile'];
@@ -79,24 +73,35 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
     return BottomNavigationBarItem(
       icon: Image.asset(
         imagePath,
-        width: 24,
-        height: 24,
+        width: 40,
+        height: 40,
         color: isSelected ? primaryDarkBlue : Colors.grey,
       ),
       label: label,
     );
   }
 
-  // (ฟังก์ชันนี้ยังมีปุ่ม back ทำงานเหมือนเดิม)
   Widget _buildHeaderRow() {
     return Padding(
-      padding: const EdgeInsets.only(left: 10.0, right: 20.0, top: 20.0, bottom: 10.0),
+      padding: const EdgeInsets.only(
+        left: 10.0,
+        right: 20.0,
+        top: 20.0,
+        bottom: 10.0,
+      ),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: primaryDarkBlue, size: 28),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: primaryDarkBlue,
+              size: 28,
+            ),
             onPressed: () {
-              Navigator.pop(context); // ปุ่ม back ยังทำงานได้
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Asset_list()),
+              );
             },
           ),
           const SizedBox(width: 5),
@@ -139,18 +144,22 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
     if (asset.status == 'Available') {
       actionButton = ElevatedButton(
         onPressed: () {},
-        style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 180, 12, 0)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 180, 12, 0),
+        ),
         child: const Text('Disable', style: TextStyle(color: Colors.white)),
       );
     } else if (asset.status == 'Disable') {
       actionButton = ElevatedButton(
         onPressed: () {},
-        style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 2, 118, 5)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 2, 118, 5),
+        ),
         child: const Text('Enable', style: TextStyle(color: Colors.white)),
       );
     } else {
       actionButton = ElevatedButton(
-        onPressed: null, 
+        onPressed: null,
         style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade600),
         child: const Text('Disable', style: TextStyle(color: Colors.white70)),
       );
@@ -175,7 +184,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
           children: [
             const Icon(Icons.laptop_mac, color: Colors.white, size: 36),
             const SizedBox(width: 16),
-            
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,23 +192,27 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                   Text(
                     asset.name,
                     style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'ID : ${asset.id}',
                     style: TextStyle(
-                        color: Colors.white.withOpacity(0.8), fontSize: 14),
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     asset.status,
                     style: TextStyle(
-                        color: statusColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600),
+                      color: statusColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
@@ -209,21 +222,27 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
             Column(
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EditAsset(),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 77, 150, 223),
-                    fixedSize: const Size(100, 36), 
+                    fixedSize: const Size(100, 36),
                   ),
-                  child: const Text('Edit', style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    'Edit',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
                 const SizedBox(height: 8),
-                SizedBox(
-                  width: 100, 
-                  height: 36,
-                  child: actionButton,
-                ),
+                SizedBox(width: 100, height: 36, child: actionButton),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -234,8 +253,8 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: primaryDarkBlue,
-      appBar: _buildAppBar(), // AppBar ที่แก้ไขแล้ว
-      
+      appBar: _buildAppBar(),
+
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
@@ -269,10 +288,10 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
               ),
               child: Column(
                 children: [
-                  _buildHeaderRow(), 
+                  _buildHeaderRow(),
                   Expanded(
                     child: ListView.builder(
-                      padding: const EdgeInsets.only(top: 10.0), 
+                      padding: const EdgeInsets.only(top: 10.0),
                       itemCount: _assets.length,
                       itemBuilder: (context, index) {
                         return _buildAssetCard(_assets[index]);

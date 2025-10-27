@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'assetdetailpage.dart'; // <-- 1. IMPORT หน้าที่ต้องการไป
+import 'assetdetailpage.dart';
 
 class Asset {
   final String name;
@@ -74,25 +74,25 @@ class _Asset_listState extends State<Asset_list> {
         _filteredAssets = _allAssets;
       } else {
         _filteredAssets = _allAssets
-            .where((asset) =>
-                asset.name.toLowerCase().contains(query.toLowerCase()))
+            .where(
+              (asset) => asset.name.toLowerCase().contains(query.toLowerCase()),
+            )
             .toList();
       }
     });
   }
 
-  // --- vvvvvvv MODIFIED FUNCTION vvvvvvv ---
   Widget _buildAssetTile(Asset asset) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15.0),
-      child: InkWell( // 2.1 หุ้มด้วย InkWell
-        onTap: () { // 2.2 เพิ่มฟังก์ชัน onTap
+      child: InkWell(
+        onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const AssetDetailPage()),
           );
         },
-        borderRadius: BorderRadius.circular(16), // 2.3 ทำให้เอฟเฟกต์การกดโค้งตามปุ่ม
+        borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
           decoration: BoxDecoration(
@@ -110,8 +110,8 @@ class _Asset_listState extends State<Asset_list> {
             children: [
               Image.asset(
                 asset.imagePath,
-                width: 36, // ขนาดไอคอนที่แก้รอบที่แล้ว
-                height: 36,
+                width: 50,
+                height: 50,
                 color: Colors.white,
               ),
               const SizedBox(width: 16),
@@ -132,7 +132,6 @@ class _Asset_listState extends State<Asset_list> {
       ),
     );
   }
-  // --- ^^^^^^^ MODIFIED FUNCTION ^^^^^^^ ---
 
   Widget _buildSearchBar() {
     return Container(
@@ -157,8 +156,10 @@ class _Asset_listState extends State<Asset_list> {
           hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
           prefixIcon: const Icon(Icons.search, color: Colors.white),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 18.0, horizontal: 20.0),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
         ),
       ),
     );
@@ -174,13 +175,16 @@ class _Asset_listState extends State<Asset_list> {
             child: ElevatedButton.icon(
               onPressed: () {},
               icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text('Add Assets',
-                  style: TextStyle(color: Colors.white, fontSize: 16)),
+              label: const Text(
+                'Add Assets',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryDarkBlue,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40)),
+                  borderRadius: BorderRadius.circular(40),
+                ),
                 elevation: 5,
               ),
             ),
@@ -189,13 +193,16 @@ class _Asset_listState extends State<Asset_list> {
           Expanded(
             child: ElevatedButton(
               onPressed: () {},
-              child: const Text('Get return Assets',
-                  style: TextStyle(color: Colors.white, fontSize: 16)),
+              child: const Text(
+                'Get return Assets',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: secondaryDarkBlue,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40)),
+                  borderRadius: BorderRadius.circular(40),
+                ),
                 elevation: 5,
               ),
             ),
@@ -213,8 +220,8 @@ class _Asset_listState extends State<Asset_list> {
     return BottomNavigationBarItem(
       icon: Image.asset(
         imagePath,
-        width: 24,
-        height: 24,
+        width: 40,
+        height: 40,
         color: isSelected ? primaryDarkBlue : Colors.grey,
       ),
       label: label,
@@ -296,8 +303,8 @@ class _Asset_listState extends State<Asset_list> {
                       child: ListView.builder(
                         itemCount:
                             _filteredAssets.isEmpty && _searchQuery.isNotEmpty
-                                ? 1
-                                : _filteredAssets.length,
+                            ? 1
+                            : _filteredAssets.length,
                         itemBuilder: (context, index) {
                           if (_filteredAssets.isEmpty &&
                               _searchController.text.isNotEmpty) {
@@ -307,13 +314,14 @@ class _Asset_listState extends State<Asset_list> {
                                 child: Text(
                                   'No asset found "${_searchController.text}"',
                                   style: const TextStyle(
-                                      fontSize: 18, color: Colors.grey),
+                                    fontSize: 18,
+                                    color: Colors.grey,
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
                             );
                           }
-                          // ตอนนี้ _buildAssetTile จะสร้างปุ่มที่กดได้
                           return _buildAssetTile(_filteredAssets[index]);
                         },
                       ),
