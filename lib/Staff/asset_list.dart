@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'assetdetailpage.dart'; // <-- 1. IMPORT หน้าที่ต้องการไป
 
 class Asset {
   final String name;
@@ -49,9 +50,7 @@ class _Asset_listState extends State<Asset_list> {
     ),
   ];
 
-
-  late List<Asset> _filteredAssets; 
-
+  late List<Asset> _filteredAssets;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   int _selectedIndex = 0;
@@ -59,16 +58,14 @@ class _Asset_listState extends State<Asset_list> {
   @override
   void initState() {
     super.initState();
-    _filteredAssets = _allAssets; 
+    _filteredAssets = _allAssets;
   }
-
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
-
 
   void _filterAssets(String query) {
     setState(() {
@@ -84,47 +81,58 @@ class _Asset_listState extends State<Asset_list> {
     });
   }
 
+  // --- vvvvvvv MODIFIED FUNCTION vvvvvvv ---
   Widget _buildAssetTile(Asset asset) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15.0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-        decoration: BoxDecoration(
-          color: asset.backgroundColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Image.asset(
-              asset.imagePath,
-              width: 50,
-              height: 50,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                asset.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  overflow: TextOverflow.ellipsis,
+      child: InkWell( // 2.1 หุ้มด้วย InkWell
+        onTap: () { // 2.2 เพิ่มฟังก์ชัน onTap
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AssetDetailPage()),
+          );
+        },
+        borderRadius: BorderRadius.circular(16), // 2.3 ทำให้เอฟเฟกต์การกดโค้งตามปุ่ม
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          decoration: BoxDecoration(
+            color: asset.backgroundColor,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Image.asset(
+                asset.imagePath,
+                width: 36, // ขนาดไอคอนที่แก้รอบที่แล้ว
+                height: 36,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  asset.name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+  // --- ^^^^^^^ MODIFIED FUNCTION ^^^^^^^ ---
 
   Widget _buildSearchBar() {
     return Container(
@@ -220,19 +228,18 @@ class _Asset_listState extends State<Asset_list> {
       appBar: AppBar(
         backgroundColor: primaryDarkBlue,
         elevation: 0,
-        centerTitle: false, 
+        centerTitle: false,
         title: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start, 
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Hello Staff!', 
+              'Hello John Smith!',
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
             const SizedBox(height: 5),
             Center(
               child: const Text(
-                'Manage Asset List', 
+                'Manage Asset List',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -298,7 +305,7 @@ class _Asset_listState extends State<Asset_list> {
                               padding: const EdgeInsets.only(top: 50.0),
                               child: Center(
                                 child: Text(
-                                  'No Asset ${_searchController.text}',
+                                  'No asset found "${_searchController.text}"',
                                   style: const TextStyle(
                                       fontSize: 18, color: Colors.grey),
                                   textAlign: TextAlign.center,
@@ -306,6 +313,7 @@ class _Asset_listState extends State<Asset_list> {
                               ),
                             );
                           }
+                          // ตอนนี้ _buildAssetTile จะสร้างปุ่มที่กดได้
                           return _buildAssetTile(_filteredAssets[index]);
                         },
                       ),
