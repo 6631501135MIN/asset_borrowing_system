@@ -14,7 +14,7 @@ class StudentHistoryPage extends StatelessWidget {
         "to": "19 Nov 2025",
         "approvedBy": "Aj.God",
         "status": "Borrowing",
-        "icon": FontAwesomeIcons.gamepad,
+        "icon": "assets/PS_Controller.png",
       },
       {
         "name": "iPad Pro M4",
@@ -23,7 +23,7 @@ class StudentHistoryPage extends StatelessWidget {
         "to": "5 Nov 2025",
         "approvedBy": "Aj.Paweena",
         "status": "Returned",
-        "icon": FontAwesomeIcons.tabletScreenButton,
+        "icon": "assets/iPad.png",
       },
       {
         "name": "Macbook Air M3",
@@ -32,7 +32,7 @@ class StudentHistoryPage extends StatelessWidget {
         "to": "18 Oct 2025",
         "approvedBy": "Aj.Surapong",
         "status": "Returned",
-        "icon": FontAwesomeIcons.laptop,
+        "icon": "assets/MacBook.png",
       },
     ];
 
@@ -56,7 +56,7 @@ class StudentHistoryPage extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const Icon(Icons.notifications_none, color: Colors.white)
+                  const Icon(Icons.notifications_none, color: Colors.white),
                 ],
               ),
             ),
@@ -93,23 +93,23 @@ class StudentHistoryPage extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0C1C64),
+                        color: const Color(0xFF0E1939),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.1),
                             blurRadius: 5,
                             offset: const Offset(0, 3),
-                          )
+                          ),
                         ],
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            item["icon"] as IconData,
-                            color: Colors.white,
-                            size: 26,
+                          Image.asset(
+                            item['icon'].toString(),
+                            width: 40,
+                            height: 40,
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -165,7 +165,7 @@ class StudentHistoryPage extends StatelessWidget {
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                )
+                                ),
                               ],
                             ),
                           ),
@@ -184,23 +184,28 @@ class StudentHistoryPage extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         selectedItemColor: const Color(0xFF0C1C64),
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: const Color(0xFF0C1C64),
         currentIndex: 1,
-        items: const [
+        showUnselectedLabels: true,
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
+            icon: Image.asset("assets/Empty_Box.png", width: 24, height: 24),
             label: "Assets",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.history),
+            icon: Image.asset(
+              "assets/Activity_History.png",
+              width: 24,
+              height: 24,
+            ),
             label: "History",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
+            icon: Image.asset("assets/Home_Page.png", width: 24, height: 24),
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
+            icon: Image.asset("assets/User.png", width: 24, height: 24),
             label: "Profile",
           ),
         ],
