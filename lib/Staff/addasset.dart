@@ -50,7 +50,7 @@ class _AddAssetState extends State<AddAsset> {
     );
   }
 
-   BottomNavigationBarItem _buildNavItem(String label, String imagePath) {
+  BottomNavigationBarItem _buildNavItem(String label, String imagePath) {
     final navItems = ['Assets', 'History', 'Home', 'Profile'];
     final currentLabel = navItems[_selectedIndex];
     bool isSelected = label == currentLabel;
@@ -78,7 +78,7 @@ class _AddAssetState extends State<AddAsset> {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const Asset_list()),
-            (Route<dynamic> route) => false, 
+            (Route<dynamic> route) => false,
           );
         } else {
           setState(() {
@@ -165,7 +165,14 @@ class _AddAssetState extends State<AddAsset> {
         children: [
           Expanded(
             child: Container(
-              color: Colors.grey.shade200,
+              margin: const EdgeInsets.only(top: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -195,7 +202,6 @@ class _AddAssetState extends State<AddAsset> {
                           ],
                         ),
                         SizedBox(height: 16),
-
                         Row(
                           children: [
                             SizedBox(
@@ -213,7 +219,6 @@ class _AddAssetState extends State<AddAsset> {
                           ],
                         ),
                         const SizedBox(height: 24),
-
                         _buildIconSelector(),
                         SizedBox(height: 24),
                         Center(
@@ -258,11 +263,12 @@ class _AddAssetState extends State<AddAsset> {
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => const Asset_list(),
                                   ),
+                                  (Route<dynamic> route) => false,
                                 );
                               },
                               child: Text(
