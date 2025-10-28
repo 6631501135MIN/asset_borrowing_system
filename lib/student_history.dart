@@ -49,7 +49,7 @@ class StudentHistoryPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Hello Min Maung!",
+                    "Hello Bhone Pyae!",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
