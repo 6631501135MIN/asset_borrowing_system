@@ -1,43 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class StudentHistoryPage extends StatelessWidget {
-  const StudentHistoryPage({super.key});
+class StaffHistory extends StatelessWidget {
+  const StaffHistory({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final historyItems = [
-      {
-        "name": "PlayStation 5",
-        "id": "PS5-1",
-        "from": "16 Nov 2025",
-        "to": "19 Nov 2025",
-        "approvedBy": "Aj.God",
-        "status": "Borrowing",
-        "icon": "assets/PS_Controller.png",
-      },
-      {
-        "name": "iPad Pro M4",
-        "id": "iPad-1",
-        "from": "2 Nov 2025",
-        "to": "5 Nov 2025",
-        "approvedBy": "Aj.Paweena",
-        "status": "Returned",
-        "icon": "assets/iPad.png",
-      },
-      {
-        "name": "Macbook Air M3",
-        "id": "Mac-1",
-        "from": "16 Oct 2025",
-        "to": "18 Oct 2025",
-        "approvedBy": "Aj.Surapong",
-        "status": "Returned",
-        "icon": "assets/MacBook.png",
-      },
-    ];
+    final historyItems = <Map<String, String>>[ 
+    {
+      "name": "PlayStation 5",
+      "id": "PS5-1",
+      "from": "16 Nov 2025",
+      "to": "19 Nov 2025",
+      "borrowedBy": "Min",
+      "approvedBy": "Aj.God",
+      "status": "Borrowing",
+      "icon": "assets/PS_Controller.png"
+    },
+    {
+      "name": "Macbook Pro M2",
+      "id": "Mac-2",
+      "from": "14 Nov 2025",
+      "to": "16 Nov 2025",
+      "borrowedBy": "Joy",
+      "returnedBy": "Joy",
+      "approvedBy": "Aj.King",
+      "status": "Returned",
+      "icon": "assets/MacBook.png"
+    },
+    {
+      "name": "iPad Air M2",
+      "id": "iPad-2",
+      "from": "1 Nov 2025",
+      "to": "18 Nov 2025",
+      "borrowedBy": "Ray",
+      "approvedBy": "Aj.Fon",
+      "status": "Borrowing",
+      "icon": "assets/iPad.png"
+    }];
 
     return Scaffold(
       backgroundColor: const Color(0xFF0C1C64),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0xFF0C1C64),
+        unselectedItemColor: const Color(0xFF0C1C64),
+        currentIndex: 1,
+        showUnselectedLabels: true,
+        items: [
+          BottomNavigationBarItem(
+            icon: Image.asset("assets/Empty_Box.png", width: 24, height: 24),
+            label: "Assets",
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              "assets/Activity_History.png",
+              width: 24,
+              height: 24,
+            ),
+            label: "History",
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset("assets/Home_Page.png", width: 24, height: 24),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset("assets/User.png", width: 24, height: 24),
+            label: "Profile",
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +80,7 @@ class StudentHistoryPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Hello Bhone Pyae!",
+                    "Hello Min Maung!",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -65,7 +96,7 @@ class StudentHistoryPage extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
               child: Text(
-                "Borrower History",
+                "Staff History",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,
@@ -179,34 +210,46 @@ class StudentHistoryPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
 
-      // Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF0C1C64),
-        unselectedItemColor: const Color(0xFF0C1C64),
-        currentIndex: 1,
-        showUnselectedLabels: true,
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/Empty_Box.png", width: 24, height: 24),
-            label: "Assets",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              "assets/Activity_History.png",
-              width: 24,
-              height: 24,
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset("assets/searchIcon.png", width: 200, height: 200),
+          const SizedBox(height: 24),
+          const Text(
+            "No history found yet",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
-            label: "History",
           ),
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/Home_Page.png", width: 24, height: 24),
-            label: "Home",
+          const SizedBox(height: 12),
+          const Text(
+            "Activity of your assets will appear.",
+            style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/User.png", width: 24, height: 24),
-            label: "Profile",
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: () {
+              // Navigate to assets page (handled by bottom navigation)
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0C1C64),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+            ),
+            child: const Text(
+              "Go to assets",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
