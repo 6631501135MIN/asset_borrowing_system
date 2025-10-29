@@ -9,6 +9,14 @@ class BorrowRequest extends StatefulWidget {
 }
 
 class _BorrowRequestState extends State<BorrowRequest> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,12 +71,11 @@ class _BorrowRequestState extends State<BorrowRequest> {
                     topRight: Radius.circular(30),
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      Container(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                      child: Container(
                         padding: const EdgeInsets.all(5),
                         child: SizedBox(
                           height: 40,
@@ -102,38 +109,64 @@ class _BorrowRequestState extends State<BorrowRequest> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      _buildRequestCard(
-                        icon: Icons.laptop_outlined,
-                        title: 'Macbook Air M3',
-                        id: 'Mac-1',
-                        from: '20 Nov 2025',
-                        to: '27 Nov 2025',
-                        status: 'Pending',
-                        statusColor: const Color(0xFFFFB020),
+                    ),
+                    Expanded(
+                      child: ListView(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                        children: [
+                          _buildRequestCard(
+                            icon: Icons.laptop_outlined,
+                            title: 'Macbook Air M3',
+                            id: 'Mac-1',
+                            from: '20 Nov 2025',
+                            to: '27 Nov 2025',
+                            status: 'Pending',
+                            statusColor: const Color(0xFFFFB020),
+                          ),
+                          const SizedBox(height: 12),
+                          _buildRequestCard(
+                            icon: Icons.tablet_mac_outlined,
+                            title: 'iPad Pro M4',
+                            id: 'iPad-1',
+                            from: '20 Nov 2025',
+                            to: '21 Nov 2025',
+                            status: 'Rejected',
+                            statusColor: Colors.red,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildRequestCard(
+                            icon: Icons.vrpano_outlined,
+                            title: 'VR Headset',
+                            id: 'VR-1',
+                            from: '20 Nov 2025',
+                            to: '23 Nov 2025',
+                            status: 'Approved',
+                            statusColor: Colors.green,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildRequestCard(
+                            icon: Icons.headphones_outlined,
+                            title: 'Sony WH-1000XM5',
+                            id: 'HP-1',
+                            from: '22 Nov 2025',
+                            to: '25 Nov 2025',
+                            status: 'Pending',
+                            statusColor: const Color(0xFFFFB020),
+                          ),
+                          const SizedBox(height: 12),
+                          _buildRequestCard(
+                            icon: Icons.camera_alt_outlined,
+                            title: 'Canon EOS R5',
+                            id: 'CAM-1',
+                            from: '23 Nov 2025',
+                            to: '30 Nov 2025',
+                            status: 'Approved',
+                            statusColor: Colors.green,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
-                      _buildRequestCard(
-                        icon: Icons.tablet_mac_outlined,
-                        title: 'iPad Pro M4',
-                        id: 'iPad-1',
-                        from: '20 Nov 2025',
-                        to: '21 Nov 2025',
-                        status: 'Rejected',
-                        statusColor: Colors.red,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildRequestCard(
-                        icon: Icons.vrpano_outlined,
-                        title: 'VR Headset',
-                        id: 'VR-1',
-                        from: '20 Nov 2025',
-                        to: '23 Nov 2025',
-                        status: 'Approved',
-                        statusColor: Colors.green,
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -143,9 +176,10 @@ class _BorrowRequestState extends State<BorrowRequest> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF0C1851),
+        selectedItemColor: const Color(0xFF1a2b5a),
         unselectedItemColor: Colors.grey,
-        currentIndex: 0,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.inventory_2_outlined),

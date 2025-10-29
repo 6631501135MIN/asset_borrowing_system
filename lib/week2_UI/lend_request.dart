@@ -1,4 +1,4 @@
-// lib/borrow_request.dart
+// lib/lend_request.dart
 import 'package:flutter/material.dart';
 
 class LendRequest extends StatefulWidget {
@@ -9,6 +9,14 @@ class LendRequest extends StatefulWidget {
 }
 
 class _LendRequestState extends State<LendRequest> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,9 +151,10 @@ class _LendRequestState extends State<LendRequest> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF0C1851),
+        selectedItemColor: const Color(0xFF1a2b5a),
         unselectedItemColor: Colors.grey,
-        currentIndex: 0,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.inventory_2_outlined),
@@ -262,7 +271,7 @@ class _LendRequestState extends State<LendRequest> {
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFE53935),
+                    backgroundColor: const Color(0xFFE53935),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     minimumSize: const Size(88, 32),
                     shape: RoundedRectangleBorder(
