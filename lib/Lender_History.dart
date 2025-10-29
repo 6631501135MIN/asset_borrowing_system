@@ -32,8 +32,9 @@ class LenderHistory extends StatelessWidget {
         "approvedBy": "Chalisa",
         "status": "Approved",
         "icon": "assets/iPad.png",
-      }
+      },
     ];
+
     return Scaffold(
       backgroundColor: const Color(0xFF0C1C64),
       bottomNavigationBar: BottomNavigationBar(
@@ -42,25 +43,30 @@ class LenderHistory extends StatelessWidget {
         unselectedItemColor: const Color(0xFF0C1C64),
         currentIndex: 1,
         showUnselectedLabels: true,
+        type: BottomNavigationBarType.fixed,
+        iconSize: 40,
+        selectedFontSize: 18,
+        unselectedFontSize: 18,
+
         items: [
           BottomNavigationBarItem(
-            icon: Image.asset("assets/Empty_Box.png", width: 24, height: 24),
+            icon: Image.asset("assets/Empty_Box.png", width: 40, height: 40),
             label: "Assets",
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
               "assets/Activity_History.png",
-              width: 24,
-              height: 24,
+              width: 30,
+              height: 40,
             ),
             label: "History",
           ),
           BottomNavigationBarItem(
-            icon: Image.asset("assets/Home_Page.png", width: 24, height: 24),
+            icon: Image.asset("assets/Home_Page.png", width: 30, height: 40),
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: Image.asset("assets/User.png", width: 24, height: 24),
+            icon: Image.asset("assets/User.png", width: 30, height: 40),
             label: "Profile",
           ),
         ],
@@ -71,32 +77,35 @@ class LenderHistory extends StatelessWidget {
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
+                children: const [
+                  Text(
                     "Hello Aj.Surapong!",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
+                      height: 1.2,
                     ),
                   ),
-                  const Icon(Icons.notifications_none, color: Colors.white),
+                  Icon(Icons.notifications_none, color: Colors.white, size: 26),
                 ],
               ),
             ),
 
             // Title
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-              child: Text(
-                "Lender History",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+            Center(
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                child: Text(
+                  "Lender History",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),
@@ -107,101 +116,104 @@ class LenderHistory extends StatelessWidget {
                 decoration: const BoxDecoration(
                   color: Color(0xFFF4F4F8),
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
                   ),
                 ),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 24,
+                ),
                 child: historyItems.isEmpty
                     ? _buildEmptyState(context)
                     : ListView.builder(
+                        physics: const BouncingScrollPhysics(),
                         itemCount: historyItems.length,
                         itemBuilder: (context, index) {
                           final item = historyItems[index];
                           return Container(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            padding: const EdgeInsets.all(16),
+                            margin: const EdgeInsets.only(bottom: 14),
+                            padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
                               color: const Color(0xFF0E1939),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image.asset(
-                                  item['icon'].toString(),
-                                  width: 40,
-                                  height: 40,
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                            child: Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            item["name"].toString(),
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            "ID: ${item["id"]}",
-                                            style: const TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                        ],
+                                      Image.asset(
+                                        item['icon'].toString(),
+                                        width: 40,
+                                        height: 60,
                                       ),
-                                      const SizedBox(height: 6),
+                                      SizedBox(width: 16),
                                       Text(
-                                        "From: ${item["from"]}\nTo: ${item["to"]}",
+                                        item["name"].toString(),
                                         style: const TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: 13,
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w700,
+                                          height: 1.3,
                                         ),
                                       ),
-                                      const SizedBox(height: 4),
+                                      SizedBox(width: 24),
                                       Text(
-                                        "Approved by: ${item["approvedBy"]}",
+                                        "ID: ${item["id"]}",
                                         style: const TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          item["status"].toString(),
-                                          style: TextStyle(
-                                            color: item["status"] == "Approved"
-                                                ? Colors.greenAccent
-                                                : item["status"] == "Rejected"
-                                                ? Colors.redAccent
-                                                : Colors.orangeAccent,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                          color: Colors.white,
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "From: ${item["from"]}\nTo: ${item["to"]}",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16.5,
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                      Text(
+                                        item["status"].toString(),
+                                        style: TextStyle(
+                                          color: item["status"] == "Rejected"
+                                              ? Colors.red
+                                              : Colors.green,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    "Approved by: ${item["approvedBy"]}",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13.5,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                ],
+                              ),
                             ),
                           );
                         },
@@ -219,29 +231,29 @@ class LenderHistory extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset("assets/searchIcon.png", width: 200, height: 200),
-          const SizedBox(height: 24),
+          Image.asset("assets/searchIcon.png", width: 220, height: 220),
+          const SizedBox(height: 28),
           const Text(
             "No history found yet",
             style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
               color: Colors.black,
             ),
           ),
+          const SizedBox(height: 10),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 28),
           ElevatedButton(
-            onPressed: () {
-              // Navigate to assets page (handled by bottom navigation)
-            },
+            onPressed: () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF0C1C64),
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(22),
               ),
+              elevation: 0,
             ),
             child: const Text(
               "Go to requests",

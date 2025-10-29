@@ -1,7 +1,6 @@
 import 'package:asset_borrowing_system/Borrower_History.dart';
 import 'package:asset_borrowing_system/Lender_History.dart';
 import 'package:asset_borrowing_system/Staff_History.dart';
-import 'package:asset_borrowing_system/bottomNavigationBar.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Asset Borrowing System',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home: const BorrowerHistory(),
+      home: const StaffHistory(),
       debugShowCheckedModeBanner: false,
     );
   }
