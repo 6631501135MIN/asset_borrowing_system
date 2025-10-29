@@ -12,6 +12,12 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 2; // Home is selected by default
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,18 +36,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       'Hello John Smith!',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.notifications_outlined),
-                      color: Colors.white,
-                      onPressed: () {},
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.notifications_outlined),
+                        color: Colors.white,
+                        iconSize: 22,
+                        onPressed: () {},
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 24),
                 
                 // Dashboard Title
                 const Center(
@@ -49,12 +62,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     'Dashboard',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 28,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 32),
                 
                 // Stat Cards Grid
                 GridView.count(
@@ -63,7 +77,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisCount: 2,
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
-                  childAspectRatio: 1.3,
+                  childAspectRatio: 1.5,
                   children: const [
                     StatCard(
                       icon: Icons.work_outline,
@@ -95,14 +109,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 32),
                 
                 // Available Assets Section
                 const Text(
                   'Available Assets',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -119,7 +133,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             label: 'Macbook',
                           ),
                         ),
-                        SizedBox(width: 16),
+                        SizedBox(width: 40),
                         Expanded(
                           child: AssetItem(
                             icon: Icons.tablet_mac,
@@ -128,7 +142,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 24),
                     Row(
                       children: [
                         Expanded(
@@ -137,7 +151,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             label: 'PlayStation',
                           ),
                         ),
-                        SizedBox(width: 16),
+                        SizedBox(width: 40),
                         Expanded(
                           child: AssetItem(
                             icon: Icons.headset,
@@ -148,41 +162,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFF0D1642),
-        selectedItemColor: const Color(0xFF5C6BC0),
-        unselectedItemColor: Colors.white70,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0xFF1a2b5a),
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.inventory_2_outlined),
             label: 'Assets',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'History',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profile',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
+          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
