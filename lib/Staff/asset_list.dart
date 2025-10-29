@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'assetdetailpage.dart';
 import 'addasset.dart';
-import 'returnasset.dart'; 
+import 'returnasset.dart';
 
 class Asset {
   final String name;
   final bool isAvailable;
   final Color backgroundColor;
-  final String imagePath;
+  final IconData iconData;
 
   Asset({
     required this.name,
     this.isAvailable = true,
     required this.backgroundColor,
-    required this.imagePath,
+    required this.iconData,
   });
 }
 
@@ -32,23 +32,23 @@ class _Asset_listState extends State<Asset_list> {
     Asset(
       name: 'Macbook',
       backgroundColor: primaryDarkBlue,
-      imagePath: 'asset/images/MacBook.png',
+      iconData: Icons.laptop_outlined,
     ),
     Asset(
       name: 'iPad',
       backgroundColor: primaryDarkBlue,
-      imagePath: 'asset/images/iPad.png',
+      iconData: Icons.tablet_mac_outlined,
     ),
     Asset(
       name: 'Playstation',
       backgroundColor: primaryDarkBlue,
-      imagePath: 'asset/images/PS.png',
+      iconData: Icons.gamepad_outlined,
     ),
     Asset(
       name: 'VR Headset',
       isAvailable: false,
       backgroundColor: Colors.grey.shade700,
-      imagePath: 'asset/images/VR.png',
+      iconData: Icons.vrpano_outlined,
     ),
   ];
 
@@ -110,12 +110,7 @@ class _Asset_listState extends State<Asset_list> {
           ),
           child: Row(
             children: [
-              Image.asset(
-                asset.imagePath,
-                width: 50,
-                height: 50,
-                color: Colors.white,
-              ),
+              Icon(asset.iconData, color: Colors.white, size: 24),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
@@ -156,7 +151,7 @@ class _Asset_listState extends State<Asset_list> {
         decoration: InputDecoration(
           hintText: 'Search Asset',
           hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
-          prefixIcon: const Icon(Icons.search, color: Colors.white),
+          prefixIcon: const Icon(Icons.search, color: Colors.white, size: 24),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             vertical: 18.0,
@@ -171,52 +166,53 @@ class _Asset_listState extends State<Asset_list> {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 20, left: 20, right: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AddAsset()),
-                );
-              },
-              icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text(
-                'Add Assets',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddAsset()),
+              );
+            },
+            icon: const Icon(Icons.add, color: Colors.white, size: 24),
+            label: const Text(
+              'Add Assets',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryDarkBlue,
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              fixedSize: const Size(160, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryDarkBlue,
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
-                ),
-                elevation: 5,
-              ),
+              elevation: 5,
             ),
           ),
-          const SizedBox(width: 15),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const GetReturnAssetsPage()),
-                );
-              },
-              child: const Text(
-                'Get return Assets',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: secondaryDarkBlue,
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
+
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const GetReturnAssetsPage(),
                 ),
-                elevation: 5,
+              );
+            },
+            child: const Text(
+              'Get return Assets',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: secondaryDarkBlue,
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+              fixedSize: const Size(160, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
               ),
+              elevation: 5,
             ),
           ),
         ],
@@ -224,18 +220,9 @@ class _Asset_listState extends State<Asset_list> {
     );
   }
 
-  BottomNavigationBarItem _buildNavItem(String label, String imagePath) {
-    final navItems = ['Assets', 'History', 'Home', 'Profile'];
-    final currentLabel = navItems[_selectedIndex];
-    bool isSelected = label == currentLabel;
-
+  BottomNavigationBarItem _buildNavItem(String label, IconData iconData) {
     return BottomNavigationBarItem(
-      icon: Image.asset(
-        imagePath,
-        width: 40,
-        height: 40,
-        color: isSelected ? primaryDarkBlue : Colors.grey,
-      ),
+      icon: Icon(iconData, size: 24),
       label: label,
     );
   }
@@ -268,11 +255,18 @@ class _Asset_listState extends State<Asset_list> {
             ),
           ],
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.notifications, color: Colors.white),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.notifications_outlined,
+              color: Colors.white,
+              size: 24,
+            ),
+            onPressed: () {},
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           ),
+          const SizedBox(width: 16),
         ],
         toolbarHeight: 100,
       ),
@@ -283,26 +277,22 @@ class _Asset_listState extends State<Asset_list> {
         unselectedItemColor: Colors.grey,
         currentIndex: _selectedIndex,
         onTap: (index) {
-           if (index == 0) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const Asset_list()),
-            (Route<dynamic> route) => false, 
-          );
-        } else {
           setState(() {
             _selectedIndex = index;
           });
-        }
-          setState(() {
-            _selectedIndex = index;
-          });
+          if (index == 0) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const Asset_list()),
+              (Route<dynamic> route) => false,
+            );
+          }
         },
         items: [
-          _buildNavItem('Assets', 'asset/images/Asset.png'),
-          _buildNavItem('History', 'asset/images/History.png'),
-          _buildNavItem('Home', 'asset/images/Home.png'),
-          _buildNavItem('Profile', 'asset/images/User.png'),
+          _buildNavItem('Assets', Icons.inventory_2_outlined),
+          _buildNavItem('History', Icons.history),
+          _buildNavItem('Home', Icons.home_filled),
+          _buildNavItem('Profile', Icons.person),
         ],
       ),
       body: Column(
@@ -326,8 +316,8 @@ class _Asset_listState extends State<Asset_list> {
                       child: ListView.builder(
                         itemCount:
                             _filteredAssets.isEmpty && _searchQuery.isNotEmpty
-                                ? 1
-                                : _filteredAssets.length,
+                            ? 1
+                            : _filteredAssets.length,
                         itemBuilder: (context, index) {
                           if (_filteredAssets.isEmpty &&
                               _searchController.text.isNotEmpty) {

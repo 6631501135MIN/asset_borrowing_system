@@ -55,28 +55,29 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
           ),
         ],
       ),
-      actions: const [
-        Padding(
-          padding: EdgeInsets.only(right: 16.0),
-          child: Icon(Icons.notifications, color: Colors.white),
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.notifications_outlined,
+            color: Colors.white,
+            size: 24, 
+          ),
+          onPressed: () {},
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(
+            minWidth: 32,
+            minHeight: 32,
+          ),
         ),
+        const SizedBox(width: 16),
       ],
       toolbarHeight: 100,
     );
   }
 
-  BottomNavigationBarItem _buildNavItem(String label, String imagePath) {
-    final navItems = ['Assets', 'History', 'Home', 'Profile'];
-    final currentLabel = navItems[_selectedIndex];
-    bool isSelected = label == currentLabel;
-
+  BottomNavigationBarItem _buildNavItem(String label, IconData iconData) {
     return BottomNavigationBarItem(
-      icon: Image.asset(
-        imagePath,
-        width: 40,
-        height: 40,
-        color: isSelected ? primaryDarkBlue : Colors.grey,
-      ),
+      icon: Icon(iconData, size: 24), 
       label: label,
     );
   }
@@ -95,7 +96,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
             icon: const Icon(
               Icons.arrow_back,
               color: primaryDarkBlue,
-              size: 28,
+              size: 28, 
             ),
             onPressed: () {
               Navigator.push(
@@ -182,7 +183,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.laptop_mac, color: Colors.white, size: 36),
+            const Icon(Icons.laptop_mac, color: Colors.white, size: 24), 
             const SizedBox(width: 16),
 
             Expanded(
@@ -255,35 +256,31 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
       backgroundColor: primaryDarkBlue,
       appBar: _buildAppBar(),
 
- bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
         selectedItemColor: primaryDarkBlue,
         unselectedItemColor: Colors.grey,
         currentIndex: _selectedIndex,
         onTap: (index) {
-           if (index == 0) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          if (index == 0) {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const Asset_list()),
             (Route<dynamic> route) => false, 
           );
-        } else {
-          setState(() {
-            _selectedIndex = index;
-          });
-        }
-          setState(() {
-            _selectedIndex = index;
-          });
+        } 
         },
         items: [
-          _buildNavItem('Assets', 'asset/images/Asset.png'),
-          _buildNavItem('History', 'asset/images/History.png'),
-          _buildNavItem('Home', 'asset/images/Home.png'),
-          _buildNavItem('Profile', 'asset/images/User.png'),
+          _buildNavItem('Assets', Icons.inventory_2_outlined),
+          _buildNavItem('History', Icons.history),
+          _buildNavItem('Home', Icons.home_filled),
+          _buildNavItem('Profile', Icons.person),
         ],
- ),
+      ),
 
       body: Column(
         children: [

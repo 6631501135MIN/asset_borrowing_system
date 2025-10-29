@@ -50,18 +50,9 @@ class _AddAssetState extends State<AddAsset> {
     );
   }
 
-  BottomNavigationBarItem _buildNavItem(String label, String imagePath) {
-    final navItems = ['Assets', 'History', 'Home', 'Profile'];
-    final currentLabel = navItems[_selectedIndex];
-    bool isSelected = label == currentLabel;
-
+  BottomNavigationBarItem _buildNavItem(String label, IconData iconData) {
     return BottomNavigationBarItem(
-      icon: Image.asset(
-        imagePath,
-        width: 40,
-        height: 40,
-        color: isSelected ? primaryDarkBlue : Colors.grey,
-      ),
+      icon: Icon(iconData, size: 24),
       label: label,
     );
   }
@@ -70,7 +61,7 @@ class _AddAssetState extends State<AddAsset> {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       backgroundColor: Colors.white,
-      selectedItemColor: primaryDarkBlue,
+      selectedItemColor: secondaryDarkBlue,
       unselectedItemColor: Colors.grey,
       currentIndex: _selectedIndex,
       onTap: (index) {
@@ -87,17 +78,17 @@ class _AddAssetState extends State<AddAsset> {
         }
       },
       items: [
-        _buildNavItem('Assets', 'asset/images/Asset.png'),
-        _buildNavItem('History', 'asset/images/History.png'),
-        _buildNavItem('Home', 'asset/images/Home.png'),
-        _buildNavItem('Profile', 'asset/images/User.png'),
+        _buildNavItem('Assets', Icons.inventory_2_outlined),
+        _buildNavItem('History', Icons.history),
+        _buildNavItem('Home', Icons.home_filled),
+        _buildNavItem('Profile', Icons.person),
       ],
     );
   }
 
   Widget _buildTextField() {
     return TextField(
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white, fontSize: 16),
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(
           vertical: 10.0,
@@ -116,12 +107,12 @@ class _AddAssetState extends State<AddAsset> {
   }
 
   Widget _buildIconSelector() {
-    const String macbookIcon = 'asset/images/MacBook.png';
-    const String psIcon = 'asset/images/PS.png';
-    const String ipadIcon = 'asset/images/iPad.png';
-    const String vrIcon = 'asset/images/VR.png';
+    const IconData macbookIcon = Icons.laptop_outlined;
+    const IconData psIcon = Icons.gamepad_outlined;
+    const IconData ipadIcon = Icons.tablet_mac_outlined;
+    const IconData vrIcon = Icons.vrpano_outlined;
 
-    Widget buildRadioIcon(int value, String imagePath) {
+    Widget buildRadioIcon(int value, IconData iconData) {
       return Row(
         children: [
           Radio<int>(
@@ -135,7 +126,7 @@ class _AddAssetState extends State<AddAsset> {
             activeColor: Colors.white,
             fillColor: MaterialStateProperty.all(Colors.white),
           ),
-          Image.asset(imagePath, color: Colors.white, width: 60, height: 60),
+          Icon(iconData, color: Colors.white, size: 40),
         ],
       );
     }
@@ -146,7 +137,7 @@ class _AddAssetState extends State<AddAsset> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [buildRadioIcon(1, macbookIcon), buildRadioIcon(2, psIcon)],
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [buildRadioIcon(3, ipadIcon), buildRadioIcon(4, vrIcon)],
@@ -178,8 +169,9 @@ class _AddAssetState extends State<AddAsset> {
                   padding: const EdgeInsets.all(20.0),
                   child: Container(
                     padding: const EdgeInsets.all(20.0),
+                    margin: const EdgeInsets.only(top: 30),
                     decoration: BoxDecoration(
-                      color: primaryDarkBlue,
+                      color: secondaryDarkBlue,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -187,78 +179,79 @@ class _AddAssetState extends State<AddAsset> {
                       children: [
                         Row(
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               width: 80,
-                              child: const Text(
+                              child: Text(
                                 'Name',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 20,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 10),
-                            SizedBox(width: 250, child: _buildTextField()),
+                            Expanded(child: _buildTextField()),
                           ],
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Row(
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               width: 80,
-                              child: const Text(
+                              child: Text(
                                 'ID',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 20,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 10),
-                            SizedBox(width: 200, child: _buildTextField()),
+                            Expanded(child: _buildTextField()),
                           ],
                         ),
                         const SizedBox(height: 24),
                         _buildIconSelector(),
-                        SizedBox(height: 24),
+                        const SizedBox(height: 24),
                         Center(
                           child: ElevatedButton.icon(
                             onPressed: () {},
-                            icon: Icon(Icons.add, color: Colors.black),
-                            label: Text(
+                            icon: const Icon(Icons.add, color: Colors.black),
+                            label: const Text(
                               'Add icon',
-                              style: TextStyle(color: Colors.black),
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                              ),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.grey.shade300,
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 20,
                                 vertical: 12,
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(height: 24),
+                        const SizedBox(height: 24),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             ElevatedButton(
                               onPressed: () {},
-                              child: Text(
-                                'save',
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(255,0,145,29,),
+                                fixedSize: const Size(120, 44),
+                              ),
+                              child: const Text(
+                                'Save', // Capitalized 'S'
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
+                                  fontWeight: FontWeight.w700,
                                 ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color.fromARGB(
-                                  255,
-                                  0,
-                                  145,
-                                  29,
-                                ),
-                                fixedSize: Size(120, 44),
                               ),
                             ),
                             ElevatedButton(
@@ -271,16 +264,17 @@ class _AddAssetState extends State<AddAsset> {
                                   (Route<dynamic> route) => false,
                                 );
                               },
-                              child: Text(
-                                'cancel',
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(255,163,0,0,),
+                                fixedSize: const Size(120, 44),
+                              ),
+                              child: const Text(
+                                'Cancel',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
+                                  fontWeight: FontWeight.w700,
                                 ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color.fromARGB(255, 163, 0, 0),
-                                fixedSize: Size(120, 44),
                               ),
                             ),
                           ],

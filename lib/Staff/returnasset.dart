@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'asset_list.dart';
 
-
 class ReturnAsset {
   final String name;
   final String id;
   final String fromDate;
   final String toDate;
-  final String imagePath;
+  final IconData iconData;
 
   ReturnAsset({
     required this.name,
     required this.id,
     required this.fromDate,
     required this.toDate,
-    required this.imagePath,
+    required this.iconData,
   });
 }
 
@@ -37,26 +36,25 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
       id: 'Mac-1',
       fromDate: '20 Nov 2025',
       toDate: '27 Nov 2025',
-      imagePath: 'asset/images/MacBook.png',
+      iconData: Icons.laptop_outlined,
     ),
     ReturnAsset(
       name: 'Playstation 5',
       id: 'PS5-1',
       fromDate: '20 Nov 2025',
       toDate: '20 Nov 2025',
-      imagePath: 'asset/images/PS.png',
+      iconData: Icons.gamepad_outlined,
     ),
     ReturnAsset(
       name: 'iPad Pro M4',
       id: 'iPad-1',
       fromDate: '8 Oct 2025',
       toDate: '10 Oct 2025',
-      imagePath: 'asset/images/iPad.png',
+      iconData: Icons.tablet_mac_outlined,
     ),
   ];
 
   late List<ReturnAsset> _filteredAssets;
-
   String _searchQuery = '';
 
   @override
@@ -85,7 +83,7 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
       }
     });
   }
-  
+
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: primaryDarkBlue,
@@ -112,28 +110,26 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
           ),
         ],
       ),
-      actions: const [
-        Padding(
-          padding: EdgeInsets.only(right: 16.0),
-          child: Icon(Icons.notifications, color: Colors.white),
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.notifications_outlined,
+            color: Colors.white,
+            size: 24,
+          ),
+          onPressed: () {},
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
         ),
+        const SizedBox(width: 16),
       ],
       toolbarHeight: 100,
     );
   }
 
-  BottomNavigationBarItem _buildNavItem(String label, String imagePath) {
-    final navItems = ['Assets', 'History', 'Home', 'Profile'];
-    final currentLabel = navItems[_selectedIndex];
-    bool isSelected = label == currentLabel;
-
+  BottomNavigationBarItem _buildNavItem(String label, IconData iconData) {
     return BottomNavigationBarItem(
-      icon: Image.asset(
-        imagePath,
-        width: 40,
-        height: 40,
-        color: isSelected ? primaryDarkBlue : Colors.grey,
-      ),
+      icon: Icon(iconData, size: 24),
       label: label,
     );
   }
@@ -146,23 +142,22 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
       unselectedItemColor: Colors.grey,
       currentIndex: _selectedIndex,
       onTap: (index) {
+        setState(() {
+          _selectedIndex = index;
+        });
         if (index == 0) {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const Asset_list()),
-            (Route<dynamic> route) => false, 
+            (Route<dynamic> route) => false,
           );
-        } else {
-          setState(() {
-            _selectedIndex = index;
-          });
         }
       },
       items: [
-        _buildNavItem('Assets', 'asset/images/Asset.png'),
-        _buildNavItem('History', 'asset/images/History.png'),
-        _buildNavItem('Home', 'asset/images/Home.png'),
-        _buildNavItem('Profile', 'asset/images/User.png'),
+        _buildNavItem('Assets', Icons.inventory_2_outlined),
+        _buildNavItem('History', Icons.history),
+        _buildNavItem('Home', Icons.home_filled),
+        _buildNavItem('Profile', Icons.person),
       ],
     );
   }
@@ -179,13 +174,15 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
           hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
           filled: true,
           fillColor: primaryDarkBlue,
-          suffixIcon: const Icon(Icons.search, color: Colors.white),
+          prefixIcon: const Icon(Icons.search, color: Colors.white, size: 24),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide.none,
           ),
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 18.0, horizontal: 20.0),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
         ),
       ),
     );
@@ -197,8 +194,9 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
       builder: (BuildContext dialogContext) {
         return Dialog(
           backgroundColor: primaryDarkBlue,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -221,8 +219,10 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
                         backgroundColor: Color.fromARGB(255, 0, 145, 29),
                         fixedSize: Size(100, 44),
                       ),
-                      child: const Text('YES',
-                          style: TextStyle(color: Colors.white)),
+                      child: const Text(
+                        'YES',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -232,11 +232,13 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
                         backgroundColor: Color.fromARGB(255, 163, 0, 0),
                         fixedSize: Size(100, 44),
                       ),
-                      child: const Text('NO',
-                          style: TextStyle(color: Colors.white)),
+                      child: const Text(
+                        'NO',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -263,12 +265,7 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
         ),
         child: Row(
           children: [
-            Image.asset(
-              asset.imagePath,
-              color: Colors.white,
-              width: 36,
-              height: 36,
-            ),
+            Icon(asset.iconData, color: Colors.white, size: 24),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -277,27 +274,34 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
                   Text(
                     asset.name,
                     style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'ID: ${asset.id}',
                     style: TextStyle(
-                        color: Colors.white.withOpacity(0.8), fontSize: 14),
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'From: ${asset.fromDate}',
                     style: TextStyle(
-                        color: Colors.white.withOpacity(0.8), fontSize: 14),
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'To: ${asset.toDate}',
                     style: TextStyle(
-                        color: Colors.white.withOpacity(0.8), fontSize: 14),
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
@@ -310,16 +314,19 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 0, 128, 164),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-              child: const Text('Return', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Return',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -342,14 +349,14 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
               child: Column(
                 children: [
                   _buildSearchBar(),
-                  
+
                   Expanded(
                     child: ListView.builder(
                       padding: const EdgeInsets.only(top: 0),
                       itemCount:
                           _filteredAssets.isEmpty && _searchQuery.isNotEmpty
-                              ? 1
-                              : _filteredAssets.length,
+                          ? 1
+                          : _filteredAssets.length,
                       itemBuilder: (context, index) {
                         if (_filteredAssets.isEmpty &&
                             _searchController.text.isNotEmpty) {
@@ -359,7 +366,9 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
                               child: Text(
                                 'No asset found "${_searchController.text}"',
                                 style: const TextStyle(
-                                    fontSize: 18, color: Colors.grey),
+                                  fontSize: 18,
+                                  color: Colors.grey,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
