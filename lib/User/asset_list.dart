@@ -61,9 +61,6 @@ class _BorrowRequestState extends State<BorrowRequest> {
               ),
             ),
             const SizedBox(height: 12),
-
-
-// กรอบขาว
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -74,7 +71,8 @@ class _BorrowRequestState extends State<BorrowRequest> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   child: Column(
                     children: [
                       SizedBox(
@@ -121,28 +119,32 @@ class _BorrowRequestState extends State<BorrowRequest> {
                                   icon: Icons.laptop_outlined,
                                   title: 'Macbook',
                                   status: 'Available',
-                                  statusColor: const Color.fromRGBO(76, 175, 80, 1),
+                                  statusColor:
+                                      const Color.fromRGBO(76, 175, 80, 1),
                                 ),
                                 const SizedBox(height: 12),
                                 simpleAssetCard(
                                   icon: Icons.tablet_mac_outlined,
                                   title: 'iPad',
                                   status: 'Available',
-                                  statusColor: const Color.fromRGBO(76, 175, 80, 1),
+                                  statusColor:
+                                      const Color.fromRGBO(76, 175, 80, 1),
                                 ),
                                 const SizedBox(height: 12),
                                 simpleAssetCard(
                                   icon: Icons.videogame_asset,
                                   title: 'PlayStation',
                                   status: 'Available',
-                                  statusColor: const Color.fromRGBO(76, 175, 80, 1),
+                                  statusColor:
+                                      const Color.fromRGBO(76, 175, 80, 1),
                                 ),
                                 const SizedBox(height: 12),
                                 simpleAssetCard(
                                   icon: Icons.vrpano_outlined,
                                   title: 'VR Headset',
                                   status: 'Disable',
-                                  statusColor: const Color.fromARGB(255, 255, 64, 64),
+                                  statusColor:
+                                      const Color.fromARGB(255, 255, 64, 64),
                                 ),
                               ],
                             ),
@@ -156,7 +158,8 @@ class _BorrowRequestState extends State<BorrowRequest> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF1a2b5a),
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 12),
                                 ),
                                 child: const Text('Check Requests'),
                               ),
@@ -180,7 +183,8 @@ class _BorrowRequestState extends State<BorrowRequest> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.inventory_2_outlined), label: 'Assets'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.inventory_2_outlined), label: 'Assets'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
           BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
@@ -206,7 +210,8 @@ class _BorrowRequestState extends State<BorrowRequest> {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(color: Color(0x14000000), blurRadius: 5, offset: Offset(0, 2)),
+          BoxShadow(
+              color: Color(0x14000000), blurRadius: 5, offset: Offset(0, 2)),
         ],
       ),
       child: Row(
