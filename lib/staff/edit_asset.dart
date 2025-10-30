@@ -1,15 +1,15 @@
-// lib/add_asset.dart
+// lib/edit_asset.dart
 import 'package:flutter/material.dart';
 import 'asset_list.dart';
 
-class AddAsset extends StatefulWidget {
-  const AddAsset({super.key});
+class EditAsset extends StatefulWidget {
+  const EditAsset({super.key});
 
   @override
-  State<AddAsset> createState() => _AddAssetState();
+  State<EditAsset> createState() => _EditAssetState();
 }
 
-class _AddAssetState extends State<AddAsset> {
+class _EditAssetState extends State<EditAsset> {
   int _selectedIndex = 0;
   int? _selectedIconGroup = 1;
 
@@ -87,7 +87,7 @@ class _AddAssetState extends State<AddAsset> {
                   });
                 },
                 activeColor: Colors.white,
-                fillColor: WidgetStateProperty.all(Colors.white),
+                fillColor: MaterialStateProperty.all(Colors.white),
               ),
               const SizedBox(width: 4),
               Icon(iconData, color: Colors.white, size: 32),
@@ -149,7 +149,7 @@ class _AddAssetState extends State<AddAsset> {
               ),
             ),
             const Text(
-              'Add Assets',
+              'Edit Assets',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,
@@ -186,8 +186,35 @@ class _AddAssetState extends State<AddAsset> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(
+                                  Icons.laptop_outlined,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
+                                SizedBox(width: 12),
+                                Text(
+                                  'Macbook Air M3',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
                           const Text(
-                            'Name',
+                            'Rename',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,

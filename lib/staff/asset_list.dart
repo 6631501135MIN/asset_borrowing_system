@@ -1,7 +1,8 @@
+// lib/asset_list.dart
 import 'package:flutter/material.dart';
-// import 'assetdetailpage.dart';
+import 'asset_details.dart';
 import 'add_asset.dart';
-// import 'returnasset.dart';
+import 'return_asset.dart';
 
 class Asset {
   final String name;
@@ -73,6 +74,7 @@ class _Asset_listState extends State<Asset_list> {
     setState(() {
       _selectedIndex = index;
     });
+    // Add navigation logic here if needed for other tabs
   }
 
   @override
