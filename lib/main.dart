@@ -47,6 +47,8 @@ import 'package:asset_borrowing_system/student/borrow_asset.dart'
 import 'package:asset_borrowing_system/student/profile.dart'
     show StudentProfile;
 import 'package:asset_borrowing_system/student/setting.dart' as student_setting;
+// ✅ ADD THIS IMPORT
+import 'package:asset_borrowing_system/student/asset_menu.dart' as student_menu;
 
 void main() {
   runApp(const MyApp());
@@ -65,7 +67,7 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xFF4169E1),
         useMaterial3: false,
       ),
-      initialRoute: '/staff-login',
+      initialRoute: '/student-login',
 
       routes: {
         // ===== Lecturer =====
@@ -104,6 +106,9 @@ class MyApp extends StatelessWidget {
         '/student-borrow': (context) => const student_borrow.BorrowAssetPage(),
         '/student-profile': (context) => const StudentProfile(),
         '/student-settings': (context) => const student_setting.Setting(),
+        // ✅ ADD THIS ROUTE
+        '/student-asset-menu': (context) =>
+            const student_menu.StudentAssetMenu(),
       },
     );
   }

@@ -17,7 +17,12 @@ class _StudentProfileState extends State<StudentProfile> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            // Go to home (student assets) instead of popping
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/student-assets',
+              (route) => false,
+            );
           },
         ),
         title: const Text('Profile', style: TextStyle(color: Colors.white)),
