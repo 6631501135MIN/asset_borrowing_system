@@ -362,14 +362,11 @@ class _Asset_listState extends State<Asset_list> {
                   horizontal: 12,
                   vertical: 6,
                 ),
-                decoration: BoxDecoration(
-                  color: asset.isAvailable ? Colors.green : Colors.red.shade400,
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                
                 child: Text(
                   asset.isAvailable ? 'Available' : 'Unavailable',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: asset.isAvailable ? Colors.green : Colors.red,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
