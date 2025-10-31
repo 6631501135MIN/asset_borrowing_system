@@ -71,7 +71,7 @@ class _StaffLoginScreenState extends State<StaffLoginScreen> {
     if (userErr != null || passErr != null) return;
 
     if (!mounted) return;
-    Navigator.pushReplacementNamed(context, '/home');
+    Navigator.pushReplacementNamed(context, '/staff-home');
   }
 
   // WHY: Guarantees the same box visual spec used in Setting screen.

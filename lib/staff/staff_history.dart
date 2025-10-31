@@ -66,7 +66,8 @@ class _StaffHistoryState extends State<StaffHistory> {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0C1C64),
+      // 🔵 Change: match background to card color
+      backgroundColor: const Color(0xFF0E1939),
 
       // ✅ Default bottom navbar (your requested config)
       bottomNavigationBar: BottomNavigationBar(
@@ -136,7 +137,8 @@ class _StaffHistoryState extends State<StaffHistory> {
                     topRight: Radius.circular(32),
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: historyItems.isEmpty
                     ? _buildEmptyState(context)
                     : ListView.builder(
@@ -145,19 +147,21 @@ class _StaffHistoryState extends State<StaffHistory> {
                         itemBuilder: (context, index) {
                           final item = historyItems[index];
                           final isBorrowing = item["status"] == "Borrowing";
-                          final Color statusColor = isBorrowing ? Colors.orange : Colors.green;
+                          final Color statusColor =
+                              isBorrowing ? Colors.orange : Colors.green;
 
                           return Container(
-                            margin: const EdgeInsets.only(bottom: 14),
-                            padding: const EdgeInsets.all(14),
+                            // 🔻 Make cards look smaller
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: const Color(0xFF0E1939),
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(14),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 3),
                                 ),
                               ],
                             ),
@@ -169,20 +173,20 @@ class _StaffHistoryState extends State<StaffHistory> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Container(
-                                      width: 60,
-                                      height: 60,
+                                      width: 48,
+                                      height: 48,
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
                                         color: const Color(0xFF1C2A54),
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Icon(
                                         _iconForItem(item['name'] ?? ''),
                                         color: Colors.white,
-                                        size: 32,
+                                        size: 26,
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
+                                    const SizedBox(width: 14),
                                     Expanded(
                                       child: Row(
                                         children: [
@@ -193,18 +197,18 @@ class _StaffHistoryState extends State<StaffHistory> {
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 20,
+                                                fontSize: 18, // ↓ from 20
                                                 fontWeight: FontWeight.w700,
                                                 height: 1.3,
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(width: 12),
+                                          const SizedBox(width: 10),
                                           Text(
                                             "ID: ${item["id"]}",
                                             style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 17,
+                                              fontSize: 14, // ↓ from 17
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -217,22 +221,23 @@ class _StaffHistoryState extends State<StaffHistory> {
 
                                 // Row: dates + status
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "From: ${item["from"]}\nTo: ${item["to"]}",
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 16.5,
+                                        fontSize: 14.5, // ↓ from 16.5
                                         height: 1.4,
                                       ),
                                     ),
-                                  Text(
+                                    Text(
                                       item["status"] ?? '',
                                       style: TextStyle(
                                         color: statusColor,
                                         fontWeight: FontWeight.w700,
-                                        fontSize: 18,
+                                        fontSize: 16, // ↓ from 18
                                       ),
                                     ),
                                   ],
@@ -241,25 +246,29 @@ class _StaffHistoryState extends State<StaffHistory> {
 
                                 // Row: borrowed/returned by + approved by
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           "Borrowed By: ${item['borrowedBy']}",
                                           style: const TextStyle(
                                             color: Colors.white,
-                                            fontSize: 16.5,
+                                            fontSize: 14.5, // ↓ from 16.5
                                             height: 1.4,
                                           ),
                                         ),
-                                        if ((item['returnedBy'] ?? '').toString().isNotEmpty)
+                                        if ((item['returnedBy'] ?? '')
+                                            .toString()
+                                            .isNotEmpty)
                                           Text(
                                             "Returned By: ${item['returnedBy']}",
                                             style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 16.5,
+                                              fontSize: 14.5, // ↓
                                               height: 1.4,
                                             ),
                                           ),
@@ -269,7 +278,7 @@ class _StaffHistoryState extends State<StaffHistory> {
                                       "Approved by: ${item["approvedBy"]}",
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 13.5,
+                                        fontSize: 12, // ↓ from 13.5
                                         height: 1.4,
                                       ),
                                     ),
@@ -291,9 +300,15 @@ class _StaffHistoryState extends State<StaffHistory> {
   // WHY: simple robust mapping by name keywords.
   IconData _iconForItem(String name) {
     final n = name.toLowerCase();
-    if (n.contains('playstation') || n.contains('ps')) return Icons.sports_esports;
-    if (n.contains('mac') || n.contains('laptop')) return Icons.laptop_mac;
-    if (n.contains('ipad') || n.contains('tablet')) return Icons.tablet_mac;
+    if (n.contains('playstation') || n.contains('ps')) {
+      return Icons.sports_esports;
+    }
+    if (n.contains('mac') || n.contains('laptop')) {
+      return Icons.laptop_mac;
+    }
+    if (n.contains('ipad') || n.contains('tablet')) {
+      return Icons.tablet_mac;
+    }
     return Icons.devices_other;
   }
 
@@ -319,15 +334,19 @@ class _StaffHistoryState extends State<StaffHistory> {
           ),
           const SizedBox(height: 28),
           ElevatedButton(
-            onPressed: () => Navigator.pushReplacementNamed(context, '/staff-assets'),
+            onPressed: () =>
+                Navigator.pushReplacementNamed(context, '/staff-assets'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF0C1C64),
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 42, vertical: 14),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(22)),
               elevation: 0,
             ),
-            child: const Text("Go to assets", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            child: const Text("Go to assets",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           ),
         ],
       ),

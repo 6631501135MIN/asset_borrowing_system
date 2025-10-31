@@ -117,7 +117,7 @@ class _DashboardState extends State<Dashboard> {
                       children: [
                         Expanded(child: AssetItem(icon: Icons.sports_esports, label: 'PlayStation')),
                         SizedBox(width: 40),
-                        Expanded(child: AssetItem(icon: Icons.headset, label: 'VR Headset')),
+                        Expanded(child: AssetItem(icon: Icons.vrpano_outlined, label: 'VR Headset')),
                       ],
                     ),
                   ],

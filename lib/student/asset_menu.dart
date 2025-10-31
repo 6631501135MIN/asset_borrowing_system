@@ -285,11 +285,10 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Status: $status',
+                  '$status',
                   style: TextStyle(
                     color: statusColor,
                     fontSize: 14,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],

@@ -15,7 +15,7 @@ class _StaffProfileState extends State<StaffProfile> {
         backgroundColor: const Color(0xFF0C1851),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () async {
             // WHY: If this page was opened with pushReplacement*, pop may fail; provide safe fallback.
             final canPop = Navigator.of(context).canPop();

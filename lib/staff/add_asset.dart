@@ -22,19 +22,19 @@ class _AddAssetState extends State<AddAsset> {
       centerTitle: false,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
+        children: const [
+          Text(
             'Hello Staff!',
-            style: TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(color: Colors.white, fontSize: 14), // was 16
           ),
-          const SizedBox(height: 5),
+          SizedBox(height: 4), // was 5
           Center(
-            child: const Text(
+            child: Text(
               'Add Assets',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+                fontSize: 22, // was 24
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -42,17 +42,17 @@ class _AddAssetState extends State<AddAsset> {
       ),
       actions: const [
         Padding(
-          padding: EdgeInsets.only(right: 16.0),
-          child: Icon(Icons.notifications, color: Colors.white),
+          padding: EdgeInsets.only(right: 14.0),
+          child: Icon(Icons.notifications, color: Colors.white, size: 22), // was default
         ),
       ],
-      toolbarHeight: 100,
+      toolbarHeight: 92, // was 100
     );
   }
 
   BottomNavigationBarItem _buildNavItem(String label, IconData iconData) {
     return BottomNavigationBarItem(
-      icon: Icon(iconData, size: 24),
+      icon: Icon(iconData, size: 22), // was 24
       label: label,
     );
   }
@@ -88,19 +88,19 @@ class _AddAssetState extends State<AddAsset> {
 
   Widget _buildTextField() {
     return TextField(
-      style: const TextStyle(color: Colors.white, fontSize: 16),
+      style: const TextStyle(color: Colors.white, fontSize: 15), // was 16
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(
-          vertical: 10.0,
-          horizontal: 12.0,
+          vertical: 9.0, // was 10
+          horizontal: 10.0, // was 12
         ),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.white.withOpacity(0.7)),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(7), // was 8
         ),
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.white),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(7), // was 8
         ),
       ),
     );
@@ -119,14 +119,12 @@ class _AddAssetState extends State<AddAsset> {
             value: value,
             groupValue: _selectedIconGroup,
             onChanged: (val) {
-              setState(() {
-                _selectedIconGroup = val;
-              });
+              setState(() => _selectedIconGroup = val);
             },
             activeColor: Colors.white,
             fillColor: MaterialStateProperty.all(Colors.white),
           ),
-          Icon(iconData, color: Colors.white, size: 40),
+          Icon(iconData, color: Colors.white, size: 34), // was 40
         ],
       );
     }
@@ -137,7 +135,7 @@ class _AddAssetState extends State<AddAsset> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [buildRadioIcon(1, macbookIcon), buildRadioIcon(2, psIcon)],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8), // was 10
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [buildRadioIcon(3, ipadIcon), buildRadioIcon(4, vrIcon)],
@@ -156,23 +154,23 @@ class _AddAssetState extends State<AddAsset> {
         children: [
           Expanded(
             child: Container(
-              margin: const EdgeInsets.only(top: 20),
+              margin: const EdgeInsets.only(top: 18), // was 20
               decoration: BoxDecoration(
                 color: Colors.grey.shade200,
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
+                  topLeft: Radius.circular(28), // was 30
+                  topRight: Radius.circular(28), // was 30
                 ),
               ),
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(18.0), // was 20
                   child: Container(
-                    padding: const EdgeInsets.all(20.0),
-                    margin: const EdgeInsets.only(top: 30),
+                    padding: const EdgeInsets.all(16.0), // was 20
+                    margin: const EdgeInsets.only(top: 24), // was 30
                     decoration: BoxDecoration(
                       color: secondaryDarkBlue,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14), // was 16
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,81 +178,77 @@ class _AddAssetState extends State<AddAsset> {
                         Row(
                           children: [
                             const SizedBox(
-                              width: 80,
+                              width: 76, // was 80
                               child: Text(
                                 'Name',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
+                                  fontSize: 15, // was 16
+                                  fontWeight: FontWeight.w600, // was 700
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 8), // was 10
                             Expanded(child: _buildTextField()),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 14), // was 16
                         Row(
                           children: [
                             const SizedBox(
-                              width: 80,
+                              width: 76, // was 80
                               child: Text(
                                 'ID',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
+                                  fontSize: 15, // was 16
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 8),
                             Expanded(child: _buildTextField()),
                           ],
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20), // was 24
                         _buildIconSelector(),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20), // was 24
                         Center(
                           child: ElevatedButton.icon(
                             onPressed: () {},
-                            icon: const Icon(Icons.add, color: Colors.black),
+                            icon: const Icon(Icons.add, color: Colors.black, size: 20),
                             label: const Text(
                               'Add icon',
                               style: TextStyle(
                                 color: Colors.black,
-                                fontSize: 16,
+                                fontSize: 15, // was 16
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.grey.shade300,
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 12,
+                                horizontal: 18, // was 20
+                                vertical: 10,  // was 12
                               ),
+                              minimumSize: const Size(0, 38),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20), // was 24
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             ElevatedButton(
                               onPressed: () {},
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(
-                                  255,
-                                  0,
-                                  145,
-                                  29,
-                                ),
-                                fixedSize: const Size(120, 44),
+                                backgroundColor: const Color.fromARGB(255, 0, 145, 29),
+                                fixedSize: const Size(112, 40), // was 120x44
                               ),
                               child: const Text(
-                                'Save', // Capitalized 'S'
+                                'Save',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 16,
+                                  fontSize: 15, // was 16
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -270,19 +264,14 @@ class _AddAssetState extends State<AddAsset> {
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(
-                                  255,
-                                  163,
-                                  0,
-                                  0,
-                                ),
-                                fixedSize: const Size(120, 44),
+                                backgroundColor: const Color.fromARGB(255, 163, 0, 0),
+                                fixedSize: const Size(112, 40), // was 120x44
                               ),
                               child: const Text(
                                 'Cancel',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 16,
+                                  fontSize: 15, // was 16
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),

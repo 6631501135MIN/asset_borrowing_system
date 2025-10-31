@@ -11,23 +11,20 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _firstName = TextEditingController();
-  final _lastName = TextEditingController();
-  final _username = TextEditingController();
-  final _email = TextEditingController();
-  final _password = TextEditingController();
-  final _confirm = TextEditingController();
-  final _phone = TextEditingController();
+  final _lastName  = TextEditingController();
+  final _username  = TextEditingController();
+  final _email     = TextEditingController();
+  final _password  = TextEditingController();
+  final _confirm   = TextEditingController();
+  final _phone     = TextEditingController();
 
   bool _obscurePwd = true;
   bool _obscureCfm = true;
 
-  // Colors (kept consistent with your app)
-  static const Color pageBg = Color(0xFF0C1851); // main background
-  static const Color panelBg = Color(
-    0xFF0E1B5C,
-  ); // inner panel (slightly different to show the card)
-  static const Color brandBlue = Color(0xFF1a2b5a);
-  static const Color borderBlue = Color(0xFF2A4B8D);
+  // === Colors copied from login ===
+  static const Color _bg       = Color(0xFF0C1851); // page background
+  static const Color _boxFill  = Color(0xFF081038); // input box fill (from login)
+  static const Color _ctaFill  = Color(0xFF1D2965); // login button color (reuse here)
 
   @override
   void dispose() {
@@ -43,101 +40,86 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/student-assets',
-        (r) => false,
-      );
+      Navigator.pushNamedAndRemoveUntil(context, '/student-assets', (r) => false);
     }
   }
+
+  // EXACT same box style as login
+  BoxDecoration _boxDecoration() => BoxDecoration(
+        color: _boxFill,
+        border: Border.all(color: Colors.white.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(8),
+      );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: pageBg,
-      appBar: AppBar(
-        title: const Text('Register'),
-        backgroundColor: pageBg,
-        elevation: 0,
-      ),
+      backgroundColor: _bg,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Center(
-            child: Container(
-              width:
-                  430, // keeps a nice narrow card on large screens; harmless on phones
-              padding: const EdgeInsets.fromLTRB(20, 28, 20, 24),
-              decoration: BoxDecoration(
-                color: panelBg,
-                borderRadius: BorderRadius.circular(16),
-              ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 360),
               child: Form(
                 key: _formKey,
                 child: Column(
                   children: [
+                    const SizedBox(height: 40),
+
                     // Logo
-                    Container(
-                      width: 62,
-                      height: 62,
-                      decoration: BoxDecoration(
-                        color: pageBg,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(
-                        Icons.layers,
-                        color: Colors.white,
-                        size: 34,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    const Icon(Icons.layers, color: Colors.white, size: 48),
+
+                    const SizedBox(height: 22),
                     const Text(
                       'Please fill your account Information',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white70, fontSize: 13.5),
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13.5,
+                        height: 1.35,
+                      ),
                     ),
                     const SizedBox(height: 18),
 
-                    // First & Last name (side by side)
+                    // First & Last name (side-by-side)
                     Row(
                       children: [
                         Expanded(
-                          child: _field(
+                          child: _boxedField(
                             controller: _firstName,
-                            hint: 'First Name',
+                            hintText: 'First Name',
                             prefixIcon: Icons.badge_outlined,
-                            validator: (v) => (v == null || v.trim().isEmpty)
-                                ? 'Required'
-                                : null,
+                            validator: (v) =>
+                                (v == null || v.trim().isEmpty) ? 'Required' : null,
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: _field(
+                          child: _boxedField(
                             controller: _lastName,
-                            hint: 'Last Name',
+                            hintText: 'Last Name',
                             prefixIcon: Icons.badge_outlined,
-                            validator: (v) => (v == null || v.trim().isEmpty)
-                                ? 'Required'
-                                : null,
+                            validator: (v) =>
+                                (v == null || v.trim().isEmpty) ? 'Required' : null,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
 
-                    _field(
+                    _boxedField(
                       controller: _username,
-                      hint: 'Username',
+                      hintText: 'Username',
                       prefixIcon: Icons.person_outline,
                       validator: (v) =>
                           (v == null || v.trim().isEmpty) ? 'Required' : null,
                     ),
                     const SizedBox(height: 12),
 
-                    _field(
+                    _boxedField(
                       controller: _email,
-                      hint: 'Email Address',
+                      hintText: 'Email Address',
                       prefixIcon: Icons.mail_outline,
                       keyboardType: TextInputType.emailAddress,
                       validator: (v) {
@@ -148,12 +130,12 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    _field(
+                    _boxedField(
                       controller: _password,
-                      hint: 'Password',
+                      hintText: 'Password',
                       prefixIcon: Icons.vpn_key_outlined,
                       isPassword: true,
-                      obscure: _obscurePwd,
+                      obscureText: _obscurePwd,
                       onToggleObscure: () =>
                           setState(() => _obscurePwd = !_obscurePwd),
                       validator: (v) {
@@ -164,61 +146,63 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    _field(
+                    _boxedField(
                       controller: _confirm,
-                      hint: 'Confirm Password',
+                      hintText: 'Confirm Password',
                       prefixIcon: Icons.vpn_key_outlined,
                       isPassword: true,
-                      obscure: _obscureCfm,
+                      obscureText: _obscureCfm,
                       onToggleObscure: () =>
                           setState(() => _obscureCfm = !_obscureCfm),
                       validator: (v) {
                         if (v == null || v.isEmpty) return 'Required';
-                        if (v != _password.text)
-                          return 'Passwords do not match';
+                        if (v != _password.text) return 'Passwords do not match';
                         return null;
                       },
                     ),
                     const SizedBox(height: 12),
 
-                    _field(
+                    _boxedField(
                       controller: _phone,
-                      hint: 'Phone Number',
+                      hintText: 'Phone Number',
                       prefixIcon: Icons.phone_outlined,
                       keyboardType: TextInputType.phone,
                       prefixText: '(+66)  ',
                       validator: (v) =>
                           (v == null || v.trim().isEmpty) ? 'Required' : null,
                     ),
-                    const SizedBox(height: 18),
 
-                    // REGISTER button
+                    const SizedBox(height: 26),
+
+                    // REGISTER (same feel as login button but full-width)
                     SizedBox(
                       width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _submit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: brandBlue,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(
-                              color: Colors.white.withOpacity(0.25),
-                            ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(10),
+                        onTap: _submit,
+                        child: Ink(
+                          decoration: _boxDecoration().copyWith(
+                            color: _ctaFill,
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                        ),
-                        child: const Text(
-                          'REGISTER',
-                          style: TextStyle(
-                            fontSize: 16,
-                            letterSpacing: 1.0,
-                            fontWeight: FontWeight.w700,
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            child: Center(
+                              child: Text(
+                                'REGISTER',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  letterSpacing: 1.0,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 12),
 
                     // Cancel
@@ -238,6 +222,8 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                         style: TextStyle(color: Colors.redAccent),
                       ),
                     ),
+
+                    const SizedBox(height: 18),
                   ],
                 ),
               ),
@@ -248,54 +234,65 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
     );
   }
 
-  // Reusable field styled like your Figma
-  Widget _field({
+  /// EXACT same input box visual spec as login.
+  Widget _boxedField({
     required TextEditingController controller,
-    required String hint,
+    required String hintText,
     required IconData prefixIcon,
     String? prefixText,
     String? Function(String?)? validator,
     TextInputType? keyboardType,
     bool isPassword = false,
-    bool obscure = false,
+    bool obscureText = false,
     VoidCallback? onToggleObscure,
   }) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: borderBlue, width: 1.3),
-      ),
-      child: TextFormField(
-        controller: controller,
-        validator: validator,
-        keyboardType: keyboardType,
-        obscureText: isPassword ? obscure : false,
-        style: const TextStyle(color: Colors.white, fontSize: 14.5),
-        decoration: InputDecoration(
-          prefixIcon: Icon(prefixIcon, color: Colors.white70, size: 20),
-          prefixText: prefixText,
-          prefixStyle: const TextStyle(color: Colors.white70, fontSize: 14),
-          hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.55)),
-          suffixIcon: isPassword
-              ? IconButton(
-                  onPressed: onToggleObscure,
-                  icon: Icon(
-                    obscure
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                    color: Colors.white60,
-                    size: 20,
-                  ),
-                )
-              : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 14,
+      decoration: _boxDecoration(),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 8.0),
+            child: Icon(prefixIcon, color: Colors.white70, size: 20),
           ),
-        ),
+          Expanded(
+            child: TextFormField(
+              controller: controller,
+              validator: validator,
+              keyboardType: keyboardType,
+              obscureText: isPassword ? obscureText : false,
+              cursorColor: Colors.white,
+              style: const TextStyle(color: Colors.white, fontSize: 13.5),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: hintText,
+                hintStyle: const TextStyle(
+                  color: Color(0x99FFFFFF),
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w300,
+                ),
+                prefixText: prefixText,
+                prefixStyle:
+                    const TextStyle(color: Colors.white70, fontSize: 14),
+                // eye icon for passwords (right side)
+                suffixIcon: isPassword
+                    ? IconButton(
+                        onPressed: onToggleObscure,
+                        icon: Icon(
+                          obscureText
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color: Colors.white70,
+                          size: 20,
+                        ),
+                      )
+                    : null,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 14),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

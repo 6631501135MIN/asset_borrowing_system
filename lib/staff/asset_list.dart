@@ -47,7 +47,7 @@ class _Asset_listState extends State<Asset_list> {
     Asset(
       name: 'Playstation',
       backgroundColor: primaryDarkBlue,
-      iconData: Icons.gamepad_outlined,
+      iconData: Icons.sports_esports_outlined,
     ),
     Asset(
       name: 'VR Headset',
@@ -141,7 +141,7 @@ class _Asset_listState extends State<Asset_list> {
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                    
                   ),
                 ),
               ),
@@ -153,31 +153,33 @@ class _Asset_listState extends State<Asset_list> {
   }
 
   Widget _buildSearchBar() {
-    return Container(
-      margin: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
-      decoration: BoxDecoration(
-        color: primaryDarkBlue,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: _searchController,
-        onChanged: _filterAssets,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintText: 'Search Asset',
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
-          prefixIcon: const Icon(Icons.search, color: Colors.white, size: 24),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 18.0,
-            horizontal: 20.0,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: FractionallySizedBox(
+        widthFactor: 0.95,
+        alignment: Alignment.centerLeft,
+        child: SizedBox(
+          height: 34,
+          child: TextField(
+            controller: _searchController,
+            onChanged: _filterAssets,
+            decoration: InputDecoration(
+              hintText: 'Search Asset',
+              hintStyle: TextStyle(
+                color: Colors.white.withOpacity(0.55),
+                fontSize: 14,
+              ),
+              filled: true,
+              fillColor: const Color(0xFF1a2b5a),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide.none,
+              ),
+              prefixIcon: const Icon(Icons.search, color: Colors.white, size: 20),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+            ),
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            textInputAction: TextInputAction.search,
           ),
         ),
       ),
@@ -186,7 +188,7 @@ class _Asset_listState extends State<Asset_list> {
 
   Widget _buildActionButtons() {
     return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 20, left: 20, right: 20),
+      padding: const EdgeInsets.only(top: 3, bottom: 10, left: 3, right: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -197,15 +199,15 @@ class _Asset_listState extends State<Asset_list> {
                 MaterialPageRoute(builder: (_) => const AddAsset()),
               );
             },
-            icon: const Icon(Icons.add, color: Colors.white, size: 24),
+            icon: const Icon(Icons.add, color: Colors.white, size: 14),
             label: const Text(
               'Add Assets',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(color: Colors.white, fontSize: 10),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryDarkBlue,
               padding: const EdgeInsets.symmetric(vertical: 15),
-              fixedSize: const Size(160, 48),
+              fixedSize: const Size(100, 40),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
@@ -225,7 +227,7 @@ class _Asset_listState extends State<Asset_list> {
             style: ElevatedButton.styleFrom(
               backgroundColor: secondaryDarkBlue,
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-              fixedSize: const Size(160, 48),
+              fixedSize: const Size(100, 40),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
@@ -233,7 +235,7 @@ class _Asset_listState extends State<Asset_list> {
             ),
             child: const Text(
               'Get return Assets',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(color: Colors.white, fontSize: 10),
             ),
           ),
         ],
@@ -256,17 +258,16 @@ class _Asset_listState extends State<Asset_list> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             Text(
-              'Hello Staff!',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              'Hello John!',
+              style: TextStyle(color: Colors.white, fontSize: 14),
             ),
-            SizedBox(height: 5),
+            SizedBox(height: 20),
             Center(
               child: Text(
                 'Manage Asset List',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -305,7 +306,7 @@ class _Asset_listState extends State<Asset_list> {
         children: [
           Expanded(
             child: Container(
-              margin: const EdgeInsets.only(top: 20),
+              margin: const EdgeInsets.only(top: 30),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
@@ -316,6 +317,7 @@ class _Asset_listState extends State<Asset_list> {
               child: Column(
                 children: [
                   _buildSearchBar(),
+                  SizedBox(height: 10),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),

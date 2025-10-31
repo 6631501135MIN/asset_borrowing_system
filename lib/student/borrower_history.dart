@@ -248,14 +248,7 @@ class _BorrowerHistoryState extends State<BorrowerHistory> {
                                 const SizedBox(height: 6),
 
                                 // Approved by
-                                Text(
-                                  "Approved by: ${item["approvedBy"]}",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13.5,
-                                    height: 1.4,
-                                  ),
-                                ),
+                                
                                 const SizedBox(height: 6),
                               ],
                             ),
