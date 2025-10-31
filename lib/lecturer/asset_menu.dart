@@ -38,31 +38,24 @@ class _LecturerAssetMenuState extends State<LecturerAssetMenu> {
       body: SafeArea(
         child: Column(
           children: [
+            // Header aligned/styled like default
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
+                children: const [
+                  Text(
                     'Hello Aj.Surapong!',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
+                  Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.white,
+                    size: 22, // default size
                   ),
                 ],
               ),
@@ -78,11 +71,12 @@ class _LecturerAssetMenuState extends State<LecturerAssetMenu> {
             const SizedBox(height: 12),
             Expanded(
               child: Container(
+                // Default background sheet settings
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: Color(0xFFF2F2F6),
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
+                    topLeft: Radius.circular(36),
+                    topRight: Radius.circular(36),
                   ),
                 ),
                 child: Padding(
@@ -109,7 +103,7 @@ class _LecturerAssetMenuState extends State<LecturerAssetMenu> {
                             style: TextStyle(
                               color: Color.fromARGB(255, 12, 24, 81),
                               fontSize: 24,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -132,12 +126,7 @@ class _LecturerAssetMenuState extends State<LecturerAssetMenu> {
                               title: 'Macbook Pro',
                               id: 'Mac-2',
                               status: 'Pending',
-                              statusColor: const Color.fromARGB(
-                                255,
-                                253,
-                                244,
-                                85,
-                              ),
+                              statusColor: const Color.fromARGB(255, 253, 244, 85),
                             ),
                             const SizedBox(height: 12),
                             requestCard(
@@ -145,12 +134,7 @@ class _LecturerAssetMenuState extends State<LecturerAssetMenu> {
                               title: 'Macbook Pro',
                               id: 'Mac-3',
                               status: 'Disable',
-                              statusColor: const Color.fromARGB(
-                                255,
-                                255,
-                                64,
-                                64,
-                              ),
+                              statusColor: const Color.fromARGB(255, 255, 64, 64),
                             ),
                             const SizedBox(height: 12),
                             requestCard(
@@ -246,11 +230,10 @@ class _LecturerAssetMenuState extends State<LecturerAssetMenu> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Status: $status',
+                  '$status',
                   style: TextStyle(
                     color: statusColor,
                     fontSize: 14,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],

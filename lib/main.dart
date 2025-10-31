@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xFF4169E1),
         useMaterial3: false,
       ),
-      initialRoute: '/student-login',
+      initialRoute: '/login',
 
       routes: {
         // ===== Lecturer =====

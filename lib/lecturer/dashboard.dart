@@ -54,7 +54,7 @@ class _DashboardState extends State<Dashboard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Hello John Smith!',
+                      'Hello Aj.Surapong!',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -181,7 +181,7 @@ class _DashboardState extends State<Dashboard> {
                         SizedBox(width: 40),
                         Expanded(
                           child: AssetItem(
-                            icon: Icons.headset,
+                            icon: Icons.vrpano_outlined,
                             label: 'VR Headset',
                           ),
                         ),

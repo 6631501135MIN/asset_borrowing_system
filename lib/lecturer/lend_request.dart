@@ -32,24 +32,128 @@ class _LendRequestState extends State<LendRequest> {
   }
 
   void _handleApprove(String assetName, String id) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Request for $assetName ($id) has been approved'),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
+    _showApproveDialog(
+      'Approved',
+      'Request for $assetName ($id) has been approved.',
     );
   }
 
   void _handleReject(String assetName, String id) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Request for $assetName ($id) has been rejected'),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 2),
-      ),
+    _showRejectDialog(
+      'Rejected',
+      'Request for $assetName ($id) has been rejected.',
     );
   }
+
+  // ---------- Dialogs ----------
+  Future<void> _showApproveDialog(String title, String message) {
+    return _showDecisionDialog(
+      title: title,
+      message: message,
+      circleBg: const Color(0xFFEAF7EF),
+      accent: const Color(0xFF22B14C),
+      icon: Icons.check_circle_rounded,
+    );
+  }
+
+  Future<void> _showRejectDialog(String title, String message) {
+    return _showDecisionDialog(
+      title: title,
+      message: message,
+      circleBg: const Color(0xFFFFEBEE),
+      accent: const Color(0xFFE53935),
+      icon: Icons.cancel_rounded,
+    );
+  }
+
+  Future<void> _showDecisionDialog({
+    required String title,
+    required String message,
+    required Color circleBg,
+    required Color accent,
+    required IconData icon,
+  }) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black54,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          elevation: 8,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+          titlePadding: EdgeInsets.zero,
+          title: Column(
+            children: [
+              const SizedBox(height: 20),
+              Container(
+                width: 62,
+                height: 62,
+                decoration: BoxDecoration(
+                  color: circleBg,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: accent, size: 40),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF0C1851),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 6),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF44506B),
+                  fontSize: 14,
+                  height: 1.35,
+                ),
+              ),
+              const SizedBox(height: 14),
+            ],
+          ),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1a2b5a),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text(
+                  'Close',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  // ---------- End dialogs ----------
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +189,7 @@ class _LendRequestState extends State<LendRequest> {
                         'Hello Aj.Surapong!',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -111,7 +215,7 @@ class _LendRequestState extends State<LendRequest> {
               'Lend Request',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -133,7 +237,7 @@ class _LendRequestState extends State<LendRequest> {
                       Container(
                         padding: const EdgeInsets.all(5),
                         child: SizedBox(
-                          height: 40,
+                          height: 35,
                           child: TextField(
                             decoration: InputDecoration(
                               hintText: 'Search Asset',

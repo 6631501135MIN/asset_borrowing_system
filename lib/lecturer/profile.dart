@@ -15,9 +15,14 @@ class _LecturerProfileState extends State<LecturerProfile> {
         backgroundColor: const Color(0xFF0C1851),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            // Go to lecturer home instead of popping
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/home',
+              (route) => false,
+            );
           },
         ),
         title: const Text('Profile', style: TextStyle(color: Colors.white)),
@@ -47,7 +52,7 @@ class _LecturerProfileState extends State<LecturerProfile> {
               ),
               const SizedBox(height: 15),
               const Text(
-                'John Smith',
+                'Surapong Uttama',
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
               const SizedBox(height: 20),
@@ -75,7 +80,7 @@ class _LecturerProfileState extends State<LecturerProfile> {
                         ),
                         const SizedBox(height: 4),
                         const Text(
-                          'John01',
+                          'Surapong',
                           style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       ],
@@ -108,7 +113,7 @@ class _LecturerProfileState extends State<LecturerProfile> {
                         ),
                         const SizedBox(height: 4),
                         const Text(
-                          'john@gmail.com',
+                          'surapong.utt@gmail.com',
                           style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       ],
