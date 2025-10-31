@@ -1,4 +1,9 @@
+// ==========================================
+// File: lib/lecturer/dashboard.dart
+// ==========================================
 import 'package:flutter/material.dart';
+import 'package:asset_borrowing_system/lecturer/lend_request.dart';
+import 'package:asset_borrowing_system/lecturer/lender_history.dart';
 
 // ========== Main Dashboard Screen ==========
 class Dashboard extends StatefulWidget {
@@ -15,6 +20,22 @@ class _DashboardState extends State<Dashboard> {
     setState(() {
       _selectedIndex = index;
     });
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, '/assets');
+        break;
+      case 1:
+        Navigator.pushReplacementNamed(context, '/history');
+        break;
+      case 2:
+        // Home - stay on current page
+        break;
+      case 3:
+        // ✅ Lecturer-only profile route (avoids student '/profile')
+        Navigator.pushReplacementNamed(context, '/lecturer-profile');
+        break;
+    }
   }
 
   @override
@@ -78,22 +99,25 @@ class _DashboardState extends State<Dashboard> {
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
                   childAspectRatio: 1.5,
-                  children: const [
+                  children: [
                     StatCard(
                       icon: Icons.inventory_2_outlined,
                       value: '50',
                       label: 'Total Assets',
-                      iconColor: Color(0xFF1A237E),
-                      iconBackground: Color(0xFFE8EAF6),
+                      iconColor: const Color(0xFF1A237E),
+                      iconBackground: const Color(0xFFE8EAF6),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/assets');
+                      },
                     ),
-                    StatCard(
+                    const StatCard(
                       icon: Icons.check_circle_outline,
                       value: '30',
                       label: 'Available',
                       iconColor: Color(0xFF2E7D32),
                       iconBackground: Color(0xFFE8F5E9),
                     ),
-                    StatCard(
+                    const StatCard(
                       icon: Icons.cancel_outlined,
                       value: '5',
                       label: 'Disabled',
@@ -104,8 +128,11 @@ class _DashboardState extends State<Dashboard> {
                       icon: Icons.arrow_forward,
                       value: '15',
                       label: 'Borrowed',
-                      iconColor: Color(0xFFEF6C00),
-                      iconBackground: Color(0xFFFFF3E0),
+                      iconColor: const Color(0xFFEF6C00),
+                      iconBackground: const Color(0xFFFFF3E0),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/requests');
+                      },
                     ),
                   ],
                 ),
@@ -196,6 +223,7 @@ class StatCard extends StatelessWidget {
   final String label;
   final Color iconColor;
   final Color iconBackground;
+  final VoidCallback? onTap;
 
   const StatCard({
     super.key,
@@ -204,62 +232,66 @@ class StatCard extends StatelessWidget {
     required this.label,
     required this.iconColor,
     required this.iconBackground,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: iconBackground,
-              borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-            child: Icon(icon, color: iconColor, size: 24),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  value,
-                  style: const TextStyle(
-                    color: Color(0xFF1A1A1A),
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    height: 1.0,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Color(0xFF757575),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: iconBackground,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: iconColor, size: 24),
             ),
-          ),
-        ],
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      color: Color(0xFF1A1A1A),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      height: 1.0,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: Color(0xFF757575),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

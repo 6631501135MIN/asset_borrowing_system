@@ -1,4 +1,3 @@
-// lib/add_asset.dart
 import 'package:flutter/material.dart';
 import 'asset_list.dart';
 
@@ -9,41 +8,100 @@ class AddAsset extends StatefulWidget {
   State<AddAsset> createState() => _AddAssetState();
 }
 
+const Color primaryDarkBlue = Color(0xFF0C1851);
+
 class _AddAssetState extends State<AddAsset> {
   int _selectedIndex = 0;
   int? _selectedIconGroup = 1;
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 0) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const Asset_list()),
-        (Route<dynamic> route) => false,
-      );
-    }
+  AppBar _buildAppBar() {
+    return AppBar(
+      backgroundColor: primaryDarkBlue,
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      centerTitle: false,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Hello Staff!',
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          const SizedBox(height: 5),
+          Center(
+            child: const Text(
+              'Add Assets',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: const [
+        Padding(
+          padding: EdgeInsets.only(right: 16.0),
+          child: Icon(Icons.notifications, color: Colors.white),
+        ),
+      ],
+      toolbarHeight: 100,
+    );
+  }
+
+  BottomNavigationBarItem _buildNavItem(String label, IconData iconData) {
+    return BottomNavigationBarItem(
+      icon: Icon(iconData, size: 24),
+      label: label,
+    );
+  }
+
+  Widget _buildBottomNavigationBar() {
+    return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.white,
+      selectedItemColor: secondaryDarkBlue,
+      unselectedItemColor: Colors.grey,
+      currentIndex: _selectedIndex,
+      onTap: (index) {
+        if (index == 0) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Asset_list()),
+            (Route<dynamic> route) => false,
+          );
+        } else {
+          setState(() {
+            _selectedIndex = index;
+          });
+        }
+      },
+      items: [
+        _buildNavItem('Assets', Icons.inventory_2_outlined),
+        _buildNavItem('History', Icons.history),
+        _buildNavItem('Home', Icons.home_filled),
+        _buildNavItem('Profile', Icons.person),
+      ],
+    );
   }
 
   Widget _buildTextField() {
     return TextField(
-      style: const TextStyle(color: Colors.white, fontSize: 14),
+      style: const TextStyle(color: Colors.white, fontSize: 16),
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(
-          vertical: 12.0,
-          horizontal: 14.0,
+          vertical: 10.0,
+          horizontal: 12.0,
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.5)),
-          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.7)),
+          borderRadius: BorderRadius.circular(8),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.white, width: 1.5),
-          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.white),
+          borderRadius: BorderRadius.circular(8),
         ),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.05),
       ),
     );
   }
@@ -55,57 +113,33 @@ class _AddAssetState extends State<AddAsset> {
     const IconData vrIcon = Icons.vrpano_outlined;
 
     Widget buildRadioIcon(int value, IconData iconData) {
-      final bool isSelected = _selectedIconGroup == value;
-      return InkWell(
-        onTap: () {
-          setState(() {
-            _selectedIconGroup = value;
-          });
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? Colors.white.withOpacity(0.15)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected ? Colors.white : Colors.white.withOpacity(0.3),
-              width: isSelected ? 2 : 1,
-            ),
+      return Row(
+        children: [
+          Radio<int>(
+            value: value,
+            groupValue: _selectedIconGroup,
+            onChanged: (val) {
+              setState(() {
+                _selectedIconGroup = val;
+              });
+            },
+            activeColor: Colors.white,
+            fillColor: MaterialStateProperty.all(Colors.white),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Radio<int>(
-                value: value,
-                groupValue: _selectedIconGroup,
-                onChanged: (val) {
-                  setState(() {
-                    _selectedIconGroup = val;
-                  });
-                },
-                activeColor: Colors.white,
-                fillColor: WidgetStateProperty.all(Colors.white),
-              ),
-              const SizedBox(width: 4),
-              Icon(iconData, color: Colors.white, size: 32),
-            ],
-          ),
-        ),
+          Icon(iconData, color: Colors.white, size: 40),
+        ],
       );
     }
 
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [buildRadioIcon(1, macbookIcon), buildRadioIcon(2, psIcon)],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [buildRadioIcon(3, ipadIcon), buildRadioIcon(4, vrIcon)],
         ),
       ],
@@ -115,225 +149,153 @@ class _AddAssetState extends State<AddAsset> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0C1851),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Hello Staff!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Text(
-              'Add Assets',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
+      backgroundColor: primaryDarkBlue,
+      appBar: _buildAppBar(),
+      bottomNavigationBar: _buildBottomNavigationBar(),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(top: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
                 ),
-                child: SingleChildScrollView(
-                  child: Padding(
+              ),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Container(
                     padding: const EdgeInsets.all(20.0),
-                    child: Container(
-                      padding: const EdgeInsets.all(20.0),
-                      margin: const EdgeInsets.only(top: 10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1a2b5a),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x14000000),
-                            blurRadius: 8,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Name',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          _buildTextField(),
-                          const SizedBox(height: 20),
-                          const Text(
-                            'ID',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          _buildTextField(),
-                          const SizedBox(height: 24),
-                          const Center(
-                            child: Text(
-                              'Select Icon',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildIconSelector(),
-                          const SizedBox(height: 20),
-                          Center(
-                            child: OutlinedButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              label: const Text(
-                                'Add icon',
+                    margin: const EdgeInsets.only(top: 30),
+                    decoration: BoxDecoration(
+                      color: secondaryDarkBlue,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 80,
+                              child: Text(
+                                'Name',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                  color: Colors.white.withOpacity(0.5),
-                                  width: 1.5,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 28),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text(
-                                    'Save',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green.shade700,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 2,
-                                  ),
+                            const SizedBox(width: 10),
+                            Expanded(child: _buildTextField()),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            const SizedBox(
+                              width: 80,
+                              child: Text(
+                                'ID',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red.shade700,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 2,
-                                  ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(child: _buildTextField()),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        _buildIconSelector(),
+                        const SizedBox(height: 24),
+                        Center(
+                          child: ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.add, color: Colors.black),
+                            label: const Text(
+                              'Add icon',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey.shade300,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(
+                                  255,
+                                  0,
+                                  145,
+                                  29,
+                                ),
+                                fixedSize: const Size(120, 44),
+                              ),
+                              child: const Text(
+                                'Save', // Capitalized 'S'
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const Asset_list(),
+                                  ),
+                                  (Route<dynamic> route) => false,
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(
+                                  255,
+                                  163,
+                                  0,
+                                  0,
+                                ),
+                                fixedSize: const Size(120, 44),
+                              ),
+                              child: const Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF1a2b5a),
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
-            label: 'Assets',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );

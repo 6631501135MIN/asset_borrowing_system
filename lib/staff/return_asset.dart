@@ -1,4 +1,3 @@
-// lib/return_asset.dart
 import 'package:flutter/material.dart';
 import 'asset_list.dart';
 
@@ -18,14 +17,16 @@ class ReturnAsset {
   });
 }
 
-class GetReturnAssetsPage extends StatefulWidget {
-  const GetReturnAssetsPage({super.key});
+class ReturnAssets extends StatefulWidget {
+  const ReturnAssets({super.key});
 
   @override
-  State<GetReturnAssetsPage> createState() => _GetReturnAssetsPageState();
+  State<ReturnAssets> createState() => _ReturnAssetsState();
 }
 
-class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
+const Color primaryDarkBlue = Color(0xFF0C1851);
+
+class _ReturnAssetsState extends State<ReturnAssets> {
   int _selectedIndex = 0;
   final TextEditingController _searchController = TextEditingController();
 
@@ -83,25 +84,116 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
     });
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 0) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const Asset_list()),
-        (Route<dynamic> route) => false,
-      );
-    }
+  AppBar _buildAppBar() {
+    return AppBar(
+      backgroundColor: primaryDarkBlue,
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      centerTitle: false,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Hello Staff!',
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          const SizedBox(height: 5),
+          Center(
+            child: const Text(
+              'Get Return Assets',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.notifications_outlined,
+            color: Colors.white,
+            size: 24,
+          ),
+          onPressed: () {},
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+        ),
+        const SizedBox(width: 16),
+      ],
+      toolbarHeight: 100,
+    );
   }
 
-  void _showReturnDialog(BuildContext context, ReturnAsset asset) {
+  BottomNavigationBarItem _buildNavItem(String label, IconData iconData) {
+    return BottomNavigationBarItem(
+      icon: Icon(iconData, size: 24),
+      label: label,
+    );
+  }
+
+  Widget _buildBottomNavigationBar() {
+    return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.white,
+      selectedItemColor: primaryDarkBlue,
+      unselectedItemColor: Colors.grey,
+      currentIndex: _selectedIndex,
+      onTap: (index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+        if (index == 0) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Asset_list()),
+            (Route<dynamic> route) => false,
+          );
+        }
+      },
+      items: [
+        _buildNavItem('Assets', Icons.inventory_2_outlined),
+        _buildNavItem('History', Icons.history),
+        _buildNavItem('Home', Icons.home_filled),
+        _buildNavItem('Profile', Icons.person),
+      ],
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: TextField(
+        controller: _searchController,
+        onChanged: _filterAssets,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          hintText: 'Search Asset',
+          hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+          filled: true,
+          fillColor: primaryDarkBlue,
+          prefixIcon: const Icon(Icons.search, color: Colors.white, size: 24),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showReturnDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
         return Dialog(
-          backgroundColor: const Color(0xFF1a2b5a),
+          backgroundColor: primaryDarkBlue,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -110,72 +202,39 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.help_outline, color: Colors.white, size: 48),
-                const SizedBox(height: 16),
                 const Text(
-                  'Confirm Return',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Are you sure you want to mark "${asset.name}" as returned?',
+                  'Are you sure getting Assets?',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 15,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 const SizedBox(height: 24),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop();
-                          // Add return logic here
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green.shade700,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'YES',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 0, 145, 29),
+                        fixedSize: Size(100, 44),
+                      ),
+                      child: const Text(
+                        'YES',
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.shade700,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'NO',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 163, 0, 0),
+                        fixedSize: Size(100, 44),
+                      ),
+                      child: const Text(
+                        'NO',
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ],
@@ -188,178 +247,26 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0C1851),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Hello Staff!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Text(
-              'Get Return Assets',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        child: SizedBox(
-                          height: 40,
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: _filterAssets,
-                            decoration: InputDecoration(
-                              hintText: 'Search Asset',
-                              hintStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.55),
-                                fontSize: 14,
-                              ),
-                              filled: true,
-                              fillColor: const Color(0xFF1a2b5a),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(22),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: const Icon(
-                                Icons.search,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 0,
-                              ),
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: _filteredAssets.isEmpty && _searchQuery.isNotEmpty
-                          ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Text(
-                                  'No asset found "$_searchQuery"',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            )
-                          : ListView.builder(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                              itemCount: _filteredAssets.length,
-                              itemBuilder: (context, index) {
-                                return _buildAssetCard(_filteredAssets[index]);
-                              },
-                            ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF1a2b5a),
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
-            label: 'Assets',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
-    );
-  }
-
   Widget _buildAssetCard(ReturnAsset asset) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 15.0, left: 20.0, right: 20.0),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: const Color(0xFF1a2b5a),
+          color: primaryDarkBlue,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Color(0x14000000),
-              blurRadius: 5,
-              offset: Offset(0, 2),
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.10),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(asset.iconData, color: Colors.white, size: 28),
-            ),
-            const SizedBox(width: 12),
+            Icon(asset.iconData, color: Colors.white, size: 24),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,32 +275,32 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
                     asset.name,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'ID: ${asset.id}',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.75),
-                      fontSize: 12,
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
                     ),
                   ),
-                  const SizedBox(height: 1),
+                  const SizedBox(height: 4),
                   Text(
                     'From: ${asset.fromDate}',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.75),
-                      fontSize: 12,
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
                     ),
                   ),
-                  const SizedBox(height: 1),
+                  const SizedBox(height: 4),
                   Text(
                     'To: ${asset.toDate}',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.75),
-                      fontSize: 12,
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
                     ),
                   ),
                 ],
@@ -402,30 +309,80 @@ class _GetReturnAssetsPageState extends State<GetReturnAssetsPage> {
             const SizedBox(width: 10),
             ElevatedButton(
               onPressed: () {
-                _showReturnDialog(context, asset);
+                _showReturnDialog(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.cyan.shade700,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
+                backgroundColor: const Color.fromARGB(255, 0, 128, 164),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                elevation: 2,
               ),
               child: const Text(
                 'Return',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: primaryDarkBlue,
+      appBar: _buildAppBar(),
+      bottomNavigationBar: _buildBottomNavigationBar(),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(top: 20),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Column(
+                children: [
+                  _buildSearchBar(),
+
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.only(top: 0),
+                      itemCount:
+                          _filteredAssets.isEmpty && _searchQuery.isNotEmpty
+                          ? 1
+                          : _filteredAssets.length,
+                      itemBuilder: (context, index) {
+                        if (_filteredAssets.isEmpty &&
+                            _searchController.text.isNotEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 50.0),
+                            child: Center(
+                              child: Text(
+                                'No asset found "${_searchController.text}"',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        }
+                        return _buildAssetCard(_filteredAssets[index]);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

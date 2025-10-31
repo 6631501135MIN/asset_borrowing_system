@@ -1,19 +1,23 @@
-// lib/asset_list.dart
+// ==========================================
+// File: lib/staff/asset_list.dart
+// FIX: use ReturnAssets() not GetReturnAssetsPage()
+// ==========================================
+import 'package:asset_borrowing_system/staff/add_asset.dart';
+import 'package:asset_borrowing_system/staff/asset_details.dart';
+import 'package:asset_borrowing_system/staff/return_asset.dart';
 import 'package:flutter/material.dart';
-import 'asset_details.dart';
-import 'add_asset.dart';
-import 'return_asset.dart';
+ // contains class ReturnAssets
 
 class Asset {
   final String name;
-  final String id;
   final bool isAvailable;
+  final Color backgroundColor;
   final IconData iconData;
 
   Asset({
     required this.name,
-    required this.id,
     this.isAvailable = true,
+    required this.backgroundColor,
     required this.iconData,
   });
 }
@@ -25,15 +29,30 @@ class Asset_list extends StatefulWidget {
   State<Asset_list> createState() => _Asset_listState();
 }
 
+const Color primaryDarkBlue = Color(0xFF0C1851);
+const Color secondaryDarkBlue = Color(0xFF0C1851);
+
 class _Asset_listState extends State<Asset_list> {
   final List<Asset> _allAssets = [
-    Asset(name: 'Macbook', id: 'Mac-1', iconData: Icons.laptop_outlined),
-    Asset(name: 'iPad', id: 'iPad-1', iconData: Icons.tablet_mac_outlined),
-    Asset(name: 'Playstation', id: 'PS-1', iconData: Icons.gamepad_outlined),
+    Asset(
+      name: 'Macbook',
+      backgroundColor: primaryDarkBlue,
+      iconData: Icons.laptop_outlined,
+    ),
+    Asset(
+      name: 'iPad',
+      backgroundColor: primaryDarkBlue,
+      iconData: Icons.tablet_mac_outlined,
+    ),
+    Asset(
+      name: 'Playstation',
+      backgroundColor: primaryDarkBlue,
+      iconData: Icons.gamepad_outlined,
+    ),
     Asset(
       name: 'VR Headset',
-      id: 'VR-1',
       isAvailable: false,
+      backgroundColor: Color(0xFF616161),
       iconData: Icons.vrpano_outlined,
     ),
   ];
@@ -58,316 +77,70 @@ class _Asset_listState extends State<Asset_list> {
   void _filterAssets(String query) {
     setState(() {
       _searchQuery = query;
-      if (query.isEmpty) {
-        _filteredAssets = _allAssets;
-      } else {
-        _filteredAssets = _allAssets
-            .where(
-              (asset) => asset.name.toLowerCase().contains(query.toLowerCase()),
-            )
-            .toList();
-      }
+      _filteredAssets = query.isEmpty
+          ? _allAssets
+          : _allAssets
+                .where(
+                  (a) => a.name.toLowerCase().contains(query.toLowerCase()),
+                )
+                .toList();
     });
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    // Add navigation logic here if needed for other tabs
+  void _onBottomNavTap(int index) {
+    if (index == _selectedIndex) return;
+    setState(() => _selectedIndex = index);
+    switch (index) {
+      case 0:
+        break;
+      case 1:
+        Navigator.pushReplacementNamed(context, '/staff-history');
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, '/staff-home');
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, '/staff-profile');
+        break;
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0C1851),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Hello Staff!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Text(
-              'Manage Asset List',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        child: SizedBox(
-                          height: 40,
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: _filterAssets,
-                            decoration: InputDecoration(
-                              hintText: 'Search Asset',
-                              hintStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.55),
-                                fontSize: 14,
-                              ),
-                              filled: true,
-                              fillColor: const Color(0xFF1a2b5a),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(22),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: const Icon(
-                                Icons.search,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 0,
-                              ),
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const AddAsset(),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              label: const Text(
-                                'Add Assets',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF1a2b5a),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 2,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const GetReturnAssetsPage(),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                'Get Return',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF1a2b5a),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 2,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Expanded(
-                      child: _filteredAssets.isEmpty && _searchQuery.isNotEmpty
-                          ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Text(
-                                  'No asset found "$_searchQuery"',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            )
-                          : ListView.builder(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                              itemCount: _filteredAssets.length,
-                              itemBuilder: (context, index) {
-                                return _buildAssetCard(_filteredAssets[index]);
-                              },
-                            ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF1a2b5a),
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
-            label: 'Assets',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAssetCard(Asset asset) {
+  Widget _buildAssetTile(Asset asset) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 15.0),
       child: InkWell(
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AssetDetailPage()),
+            MaterialPageRoute(builder: (_) => const AssetDetailPage()),
           );
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
           decoration: BoxDecoration(
-            color: asset.isAvailable
-                ? const Color(0xFF1a2b5a)
-                : Colors.grey.shade600,
+            color: asset.backgroundColor,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Color(0x14000000),
-                blurRadius: 5,
-                offset: Offset(0, 2),
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
           child: Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.10),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(asset.iconData, color: Colors.white, size: 28),
-              ),
-              const SizedBox(width: 12),
+              Icon(asset.iconData, color: Colors.white, size: 24),
+              const SizedBox(width: 16),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      asset.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'ID: ${asset.id}',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.75),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                
                 child: Text(
-                  asset.isAvailable ? 'Available' : 'Unavailable',
-                  style: TextStyle(
-                    color: asset.isAvailable ? Colors.green : Colors.red,
-                    fontSize: 12,
+                  asset.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -375,6 +148,210 @@ class _Asset_listState extends State<Asset_list> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 20),
+      decoration: BoxDecoration(
+        color: primaryDarkBlue,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: _filterAssets,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          hintText: 'Search Asset',
+          hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+          prefixIcon: const Icon(Icons.search, color: Colors.white, size: 24),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10, bottom: 20, left: 20, right: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AddAsset()),
+              );
+            },
+            icon: const Icon(Icons.add, color: Colors.white, size: 24),
+            label: const Text(
+              'Add Assets',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryDarkBlue,
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              fixedSize: const Size(160, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+              elevation: 5,
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // FIX: push ReturnAssets() (your class)
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ReturnAssets()),
+              );
+              // Alternatively, if you prefer named route after main.dart change:
+              // Navigator.pushNamed(context, '/return-assets');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: secondaryDarkBlue,
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+              fixedSize: const Size(160, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+              elevation: 5,
+            ),
+            child: const Text(
+              'Get return Assets',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  BottomNavigationBarItem _buildNavItem(String label, IconData iconData) =>
+      BottomNavigationBarItem(icon: Icon(iconData, size: 24), label: label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: primaryDarkBlue,
+      appBar: AppBar(
+        backgroundColor: primaryDarkBlue,
+        elevation: 0,
+        centerTitle: false,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              'Hello Staff!',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            SizedBox(height: 5),
+            Center(
+              child: Text(
+                'Manage Asset List',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.notifications_outlined,
+              color: Colors.white,
+              size: 24,
+            ),
+            onPressed: () {},
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+          ),
+          const SizedBox(width: 16),
+        ],
+        toolbarHeight: 100,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: primaryDarkBlue,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onBottomNavTap,
+        items: [
+          _buildNavItem('Assets', Icons.inventory_2_outlined),
+          _buildNavItem('History', Icons.history),
+          _buildNavItem('Home', Icons.home_filled),
+          _buildNavItem('Profile', Icons.person),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(top: 20),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Column(
+                children: [
+                  _buildSearchBar(),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: ListView.builder(
+                        itemCount:
+                            _filteredAssets.isEmpty && _searchQuery.isNotEmpty
+                            ? 1
+                            : _filteredAssets.length,
+                        itemBuilder: (context, index) {
+                          if (_filteredAssets.isEmpty &&
+                              _searchController.text.isNotEmpty) {
+                            return const Padding(
+                              padding: EdgeInsets.only(top: 50.0),
+                              child: Center(
+                                child: Text(
+                                  'No asset found',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            );
+                          }
+                          return _buildAssetTile(_filteredAssets[index]);
+                        },
+                      ),
+                    ),
+                  ),
+                  _buildActionButtons(),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

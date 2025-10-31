@@ -14,6 +14,21 @@ class _LenderHistoryState extends State<LenderHistory> {
     setState(() {
       _selectedIndex = index;
     });
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, '/assets');
+        break;
+      case 1:
+        // Already on History page
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, '/home');
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, '/profile');
+        break;
+    }
   }
 
   @override
@@ -267,7 +282,9 @@ class _LenderHistoryState extends State<LenderHistory> {
             ),
             const SizedBox(height: 32),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/requests');
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1a2b5a),
                 foregroundColor: Colors.white,

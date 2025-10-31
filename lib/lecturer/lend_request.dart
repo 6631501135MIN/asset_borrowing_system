@@ -1,4 +1,3 @@
-// lib/lend_request.dart
 import 'package:flutter/material.dart';
 
 class LendRequest extends StatefulWidget {
@@ -15,6 +14,41 @@ class _LendRequestState extends State<LendRequest> {
     setState(() {
       _selectedIndex = index;
     });
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, '/assets');
+        break;
+      case 1:
+        Navigator.pushReplacementNamed(context, '/history');
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, '/home');
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, '/profile');
+        break;
+    }
+  }
+
+  void _handleApprove(String assetName, String id) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Request for $assetName ($id) has been approved'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _handleReject(String assetName, String id) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Request for $assetName ($id) has been rejected'),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -29,13 +63,33 @@ class _LendRequestState extends State<LendRequest> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Hello Aj.Surapong!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Hello Aj.Surapong!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
                   ),
                   IconButton(
                     icon: const Icon(
@@ -246,7 +300,7 @@ class _LendRequestState extends State<LendRequest> {
               SizedBox(
                 height: 32,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () => _handleApprove(title, id),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF22B14C),
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -269,7 +323,7 @@ class _LendRequestState extends State<LendRequest> {
               SizedBox(
                 height: 32,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () => _handleReject(title, id),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE53935),
                     padding: const EdgeInsets.symmetric(horizontal: 16),

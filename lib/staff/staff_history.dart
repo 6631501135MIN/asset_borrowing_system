@@ -1,3 +1,6 @@
+// ==========================================
+// File: lib/staff/staff_history.dart
+// ==========================================
 import 'package:flutter/material.dart';
 
 class StaffHistory extends StatefulWidget {
@@ -11,14 +14,27 @@ class _StaffHistoryState extends State<StaffHistory> {
   int _selectedIndex = 1;
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (_selectedIndex == index) return; // avoid redundant rebuilds
+    setState(() => _selectedIndex = index);
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, '/staff-assets');
+        break;
+      case 1:
+        // stay here
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, '/staff-home');
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, '/staff-profile');
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final historyItems = <Map<String, dynamic>>[
+    final List<Map<String, String?>> historyItems = <Map<String, String?>>[
       {
         "name": "PlayStation 5",
         "id": "PS5-1",
@@ -27,8 +43,6 @@ class _StaffHistoryState extends State<StaffHistory> {
         "borrowedBy": "Min",
         "approvedBy": "Aj.God",
         "status": "Borrowing",
-        "icon": Icons.sports_esports_outlined,
-        "returnedBy": null,
       },
       {
         "name": "Macbook Pro M2",
@@ -39,7 +53,6 @@ class _StaffHistoryState extends State<StaffHistory> {
         "returnedBy": "Joy",
         "approvedBy": "Aj.King",
         "status": "Returned",
-        "icon": Icons.laptop_outlined,
       },
       {
         "name": "iPad Air M2",
@@ -49,95 +62,13 @@ class _StaffHistoryState extends State<StaffHistory> {
         "borrowedBy": "Ray",
         "approvedBy": "Aj.Fon",
         "status": "Borrowing",
-        "icon": Icons.tablet_mac_outlined,
-        "returnedBy": null,
       },
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0C1851),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Hello John Smith!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Text(
-              'Staff History',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                ),
-                child: historyItems.isEmpty
-                    ? _buildEmptyState()
-                    : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: historyItems.length,
-                        itemBuilder: (context, index) {
-                          final item = historyItems[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: _buildHistoryCard(
-                              icon: item['icon'] as IconData,
-                              title: item['name'] as String,
-                              id: item['id'] as String,
-                              from: item['from'] as String,
-                              to: item['to'] as String,
-                              borrowedBy: item['borrowedBy'] as String,
-                              approvedBy: item['approvedBy'] as String,
-                              returnedBy: item['returnedBy'] as String?,
-                              status: item['status'] as String,
-                              statusColor: item['status'] == 'Borrowing'
-                                  ? Colors.orange
-                                  : Colors.green,
-                            ),
-                          );
-                        },
-                      ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      backgroundColor: const Color(0xFF0C1C64),
+
+      // ✅ Default bottom navbar (your requested config)
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
@@ -155,176 +86,250 @@ class _StaffHistoryState extends State<StaffHistory> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
-    );
-  }
 
-  Widget _buildHistoryCard({
-    required IconData icon,
-    required String title,
-    required String id,
-    required String from,
-    required String to,
-    required String borrowedBy,
-    required String approvedBy,
-    String? returnedBy,
-    required String status,
-    required Color statusColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1a2b5a),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.10),
-              borderRadius: BorderRadius.circular(10),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text(
+                    "Hello John Smith!",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                    ),
+                  ),
+                  Icon(Icons.notifications_none, color: Colors.white, size: 26),
+                ],
+              ),
             ),
-            child: Icon(icon, color: Colors.white, size: 28),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
+
+            // Title
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: Center(
+                child: Text(
+                  "Staff History",
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 26,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'ID: $id',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.75),
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  'From: $from',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.75),
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  'To: $to',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.75),
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Text(
-                  'Borrowed by: $borrowedBy',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.75),
-                    fontSize: 12,
-                  ),
-                ),
-                if (returnedBy != null) ...[
-                  const SizedBox(height: 1),
-                  Text(
-                    'Returned by: $returnedBy',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.75),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 1),
-                Text(
-                  'Approved by: $approvedBy',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.75),
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-          Text(
-            status,
-            style: TextStyle(
-              color: statusColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 120,
-              color: Colors.grey.withOpacity(0.3),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'No history found yet',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Activity of your assets will appear.',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black.withOpacity(0.6),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1a2b5a),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 14,
+            // History List
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF4F4F8),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                elevation: 2,
-              ),
-              child: const Text(
-                'Go to assets',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: historyItems.isEmpty
+                    ? _buildEmptyState(context)
+                    : ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: historyItems.length,
+                        itemBuilder: (context, index) {
+                          final item = historyItems[index];
+                          final isBorrowing = item["status"] == "Borrowing";
+                          final Color statusColor = isBorrowing ? Colors.orange : Colors.green;
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 14),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0E1939),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Row: icon, name, id
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 60,
+                                      height: 60,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF1C2A54),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Icon(
+                                        _iconForItem(item['name'] ?? ''),
+                                        color: Colors.white,
+                                        size: 32,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              item["name"] ?? '',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w700,
+                                                height: 1.3,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Text(
+                                            "ID: ${item["id"]}",
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+
+                                // Row: dates + status
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "From: ${item["from"]}\nTo: ${item["to"]}",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16.5,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  Text(
+                                      item["status"] ?? '',
+                                      style: TextStyle(
+                                        color: statusColor,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+
+                                // Row: borrowed/returned by + approved by
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Borrowed By: ${item['borrowedBy']}",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16.5,
+                                            height: 1.4,
+                                          ),
+                                        ),
+                                        if ((item['returnedBy'] ?? '').toString().isNotEmpty)
+                                          Text(
+                                            "Returned By: ${item['returnedBy']}",
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16.5,
+                                              height: 1.4,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    Text(
+                                      "Approved by: ${item["approvedBy"]}",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13.5,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // WHY: simple robust mapping by name keywords.
+  IconData _iconForItem(String name) {
+    final n = name.toLowerCase();
+    if (n.contains('playstation') || n.contains('ps')) return Icons.sports_esports;
+    if (n.contains('mac') || n.contains('laptop')) return Icons.laptop_mac;
+    if (n.contains('ipad') || n.contains('tablet')) return Icons.tablet_mac;
+    return Icons.devices_other;
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.search, size: 120, color: Color(0xFF0C1C64)),
+          const SizedBox(height: 28),
+          const Text(
+            "No history found yet",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            "Activity of your assets will appear.",
+            style: TextStyle(fontSize: 16, color: Colors.black, height: 1.4),
+          ),
+          const SizedBox(height: 28),
+          ElevatedButton(
+            onPressed: () => Navigator.pushReplacementNamed(context, '/staff-assets'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0C1C64),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+              elevation: 0,
+            ),
+            child: const Text("Go to assets", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          ),
+        ],
       ),
     );
   }

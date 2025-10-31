@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class Profile extends StatefulWidget {
-  const Profile({super.key});
+class LecturerProfile extends StatefulWidget {
+  const LecturerProfile({super.key});
 
   @override
-  State<Profile> createState() => _ProfileState();
+  State<LecturerProfile> createState() => _LecturerProfileState();
 }
 
-class _ProfileState extends State<Profile> {
+class _LecturerProfileState extends State<LecturerProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,12 +45,12 @@ class _ProfileState extends State<Profile> {
                   ),
                 ),
               ),
-              SizedBox(height: 15),
-              Text(
+              const SizedBox(height: 15),
+              const Text(
                 'John Smith',
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -73,8 +73,8 @@ class _ProfileState extends State<Profile> {
                             fontSize: 10,
                           ),
                         ),
-                        SizedBox(height: 4),
-                        Text(
+                        const SizedBox(height: 4),
+                        const Text(
                           'John01',
                           style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
@@ -83,7 +83,7 @@ class _ProfileState extends State<Profile> {
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -106,8 +106,8 @@ class _ProfileState extends State<Profile> {
                             fontSize: 10,
                           ),
                         ),
-                        SizedBox(height: 4),
-                        Text(
+                        const SizedBox(height: 4),
+                        const Text(
                           'john@gmail.com',
                           style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
@@ -116,7 +116,7 @@ class _ProfileState extends State<Profile> {
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -139,8 +139,8 @@ class _ProfileState extends State<Profile> {
                             fontSize: 10,
                           ),
                         ),
-                        SizedBox(height: 4),
-                        Text(
+                        const SizedBox(height: 4),
+                        const Text(
                           '(+66) 312 324 542',
                           style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
@@ -149,9 +149,12 @@ class _ProfileState extends State<Profile> {
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  // Lecturer-specific settings route
+                  Navigator.pushNamed(context, '/lecturer-settings');
+                },
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -165,13 +168,10 @@ class _ProfileState extends State<Profile> {
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                    children: const [
                       Text(
                         'Setting',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 14),
                       ),
                       Icon(
                         Icons.arrow_forward_ios,
@@ -182,7 +182,7 @@ class _ProfileState extends State<Profile> {
                   ),
                 ),
               ),
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -210,6 +210,11 @@ class _ProfileState extends State<Profile> {
                               ElevatedButton(
                                 onPressed: () {
                                   Navigator.of(context).pop();
+                                  Navigator.pushNamedAndRemoveUntil(
+                                    this.context,
+                                    '/login', // lecturer login
+                                    (route) => false,
+                                  );
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green,

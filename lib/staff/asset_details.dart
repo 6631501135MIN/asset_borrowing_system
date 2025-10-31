@@ -1,6 +1,5 @@
-// lib/asset_details.dart
+import 'package:asset_borrowing_system/staff/edit_asset.dart';
 import 'package:flutter/material.dart';
-import 'edit_asset.dart';
 import 'asset_list.dart';
 
 class SpecificAsset {
@@ -18,6 +17,8 @@ class AssetDetailPage extends StatefulWidget {
   State<AssetDetailPage> createState() => _AssetDetailPageState();
 }
 
+const Color primaryDarkBlue = Color(0xFF0C1851);
+
 class _AssetDetailPageState extends State<AssetDetailPage> {
   int _selectedIndex = 0;
 
@@ -28,139 +29,88 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
     SpecificAsset(name: 'Macbook Air M2', id: 'Mac-4', status: 'Borrowed'),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    if (index == 0) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const Asset_list()),
-        (Route<dynamic> route) => false,
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0C1851),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Hello Staff!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minWidth: 32,
-                      minHeight: 32,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Text(
+  AppBar _buildAppBar() {
+    return AppBar(
+      backgroundColor: primaryDarkBlue,
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      centerTitle: false,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Hello Staff!',
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          const SizedBox(height: 5),
+          Center(
+            child: const Text(
               'Manage Asset List',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.arrow_back,
-                              color: Color(0xFF1a2b5a),
-                              size: 24,
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(
-                              minWidth: 32,
-                              minHeight: 32,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Expanded(
-                            child: Text(
-                              'Asset List Macbook',
-                              style: TextStyle(
-                                color: Color(0xFF1a2b5a),
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                        itemCount: _assets.length,
-                        itemBuilder: (context, index) {
-                          return _buildAssetCard(_assets[index]);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF1a2b5a),
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
-            label: 'Assets',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.notifications_outlined,
+            color: Colors.white,
+            size: 24,
+          ),
+          onPressed: () {},
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+        ),
+        const SizedBox(width: 16),
+      ],
+      toolbarHeight: 100,
+    );
+  }
+
+  BottomNavigationBarItem _buildNavItem(String label, IconData iconData) {
+    return BottomNavigationBarItem(
+      icon: Icon(iconData, size: 24),
+      label: label,
+    );
+  }
+
+  Widget _buildHeaderRow() {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 10.0,
+        right: 20.0,
+        top: 20.0,
+        bottom: 10.0,
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: primaryDarkBlue,
+              size: 28,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Asset_list()),
+              );
+            },
+          ),
+          const SizedBox(width: 5),
+          const Text(
+            'Asset List Macbook',
+            style: TextStyle(
+              color: primaryDarkBlue,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
@@ -168,23 +118,21 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
 
   Widget _buildAssetCard(SpecificAsset asset) {
     final bool isEnabled = asset.status != 'Disable';
-    final Color cardColor = isEnabled
-        ? const Color(0xFF1a2b5a)
-        : Colors.grey.shade600;
+    final Color cardColor = isEnabled ? primaryDarkBlue : Colors.grey.shade700;
 
     Color statusColor;
     switch (asset.status) {
       case 'Available':
-        statusColor = Colors.green;
+        statusColor = const Color.fromARGB(255, 2, 103, 22);
         break;
       case 'Pending':
-        statusColor = const Color(0xFFFFB020);
+        statusColor = const Color.fromARGB(255, 225, 186, 13);
         break;
       case 'Disable':
-        statusColor = Colors.red;
+        statusColor = const Color.fromARGB(255, 166, 0, 34);
         break;
       case 'Borrowed':
-        statusColor = Colors.orange;
+        statusColor = Colors.orangeAccent.shade400;
         break;
       default:
         statusColor = Colors.white;
@@ -192,107 +140,49 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
 
     Widget actionButton;
     if (asset.status == 'Available') {
-      actionButton = SizedBox(
-        width: 90,
-        height: 36,
-        child: ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red.shade700,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: EdgeInsets.zero,
-          ),
-          child: const Text(
-            'Disable',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+      actionButton = ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 180, 12, 0),
         ),
+        child: const Text('Disable', style: TextStyle(color: Colors.white)),
       );
     } else if (asset.status == 'Disable') {
-      actionButton = SizedBox(
-        width: 90,
-        height: 36,
-        child: ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green.shade700,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: EdgeInsets.zero,
-          ),
-          child: const Text(
-            'Enable',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+      actionButton = ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 2, 118, 5),
         ),
+        child: const Text('Enable', style: TextStyle(color: Colors.white)),
       );
     } else {
-      actionButton = SizedBox(
-        width: 90,
-        height: 36,
-        child: ElevatedButton(
-          onPressed: null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey.shade400,
-            disabledBackgroundColor: Colors.grey.shade400,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: EdgeInsets.zero,
-          ),
-          child: const Text(
-            'Disable',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
+      actionButton = ElevatedButton(
+        onPressed: null,
+        style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade600),
+        child: const Text('Disable', style: TextStyle(color: Colors.white70)),
       );
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 15.0, left: 20.0, right: 20.0),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Color(0x14000000),
-              blurRadius: 5,
-              offset: Offset(0, 2),
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.10),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.laptop_outlined,
-                color: Colors.white,
-                size: 28,
-              ),
-            ),
-            const SizedBox(width: 12),
+            const Icon(Icons.laptop_mac, color: Colors.white, size: 24),
+            const SizedBox(width: 16),
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,16 +191,16 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                     asset.name,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'ID: ${asset.id}',
+                    'ID : ${asset.id}',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.75),
-                      fontSize: 12,
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -318,51 +208,106 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                     asset.status,
                     style: TextStyle(
                       color: statusColor,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 10),
+
             Column(
               children: [
-                SizedBox(
-                  width: 90,
-                  height: 36,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const EditAsset(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade600,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EditAsset(),
                       ),
-                      padding: EdgeInsets.zero,
-                    ),
-                    child: const Text(
-                      'Edit',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 77, 150, 223),
+                    fixedSize: const Size(100, 36),
+                  ),
+                  child: const Text(
+                    'Edit',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 8),
-                actionButton,
+                SizedBox(width: 100, height: 36, child: actionButton),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: primaryDarkBlue,
+      appBar: _buildAppBar(),
+
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: primaryDarkBlue,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          if (index == 0) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const Asset_list()),
+              (Route<dynamic> route) => false,
+            );
+          }
+        },
+        items: [
+          _buildNavItem('Assets', Icons.inventory_2_outlined),
+          _buildNavItem('History', Icons.history),
+          _buildNavItem('Home', Icons.home_filled),
+          _buildNavItem('Profile', Icons.person),
+        ],
+      ),
+
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(top: 20),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Column(
+                children: [
+                  _buildHeaderRow(),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      itemCount: _assets.length,
+                      itemBuilder: (context, index) {
+                        return _buildAssetCard(_assets[index]);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
