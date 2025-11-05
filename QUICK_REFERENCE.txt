@@ -1,0 +1,76 @@
+╔══════════════════════════════════════════════════════════════════╗
+║               🎯 QUICK REFERENCE CARD 🎯                         ║
+╚══════════════════════════════════════════════════════════════════╝
+
+📡 CURRENT API URL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+http://192.168.1.173:3000/api
+
+🔧 CHANGE HOST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+./change_host.sh           # Interactive menu
+OR
+Edit .env → Change HOST value → npm start
+
+⚙️  COMMON COMMANDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+npm start                  # Start server
+npm run setup              # Reset database
+./test_api.sh              # Quick API test
+./change_host.sh           # Change host interactively
+
+📝 CONFIGURATION FILES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+.env                       # Your configuration (change here!)
+.env.example               # Template
+ENV_CONFIGURATION.md       # Detailed guide
+
+⚡ THUNDER CLIENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Open Thunder Client
+2. Go to Collections
+3. Find "Student Registration API"
+4. Select environment: "Local Development" or "Localhost"
+5. Run tests!
+
+🧪 QUICK TESTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Register
+curl -X POST http://192.168.1.173:3000/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@ex.com","password":"Pass123!","first_name":"Test","username":"test123"}'
+
+# Login
+curl -X POST http://192.168.1.173:3000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# Get Assets
+curl http://192.168.1.173:3000/api/student/assets
+
+📚 DOCUMENTATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ENV_CONFIGURATION.md       ← How to change HOST/settings
+ENV_SETUP_COMPLETE.txt     ← What's been done
+API_REFERENCE.md           ← All endpoints
+THUNDER_CLIENT_GUIDE.md    ← Testing guide
+README.md                  ← Full documentation
+
+🔄 HOST OPTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+localhost      → Local testing only
+192.168.1.173  → Your network (phone, tablet, etc.)
+0.0.0.0        → All interfaces
+Custom IP      → Any IP you want
+
+✨ KEY FEATURES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Environment variables (.env)
+✅ Easy host switching
+✅ IPv4 address support
+✅ Thunder Client environments
+✅ Works on same WiFi network
+✅ No code changes needed!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Print this for quick reference! 📋

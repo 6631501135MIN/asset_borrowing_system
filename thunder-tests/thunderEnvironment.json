@@ -1,0 +1,46 @@
+[
+  {
+    "_id": "env_base_url",
+    "name": "Local Development",
+    "default": true,
+    "sortNum": 10000,
+    "created": "2025-11-05T00:00:00.000Z",
+    "modified": "2025-11-05T00:00:00.000Z",
+    "data": [
+      {
+        "name": "BASE_URL",
+        "value": "http://192.168.1.173:3000"
+      },
+      {
+        "name": "HOST",
+        "value": "192.168.1.173"
+      },
+      {
+        "name": "PORT",
+        "value": "3000"
+      }
+    ]
+  },
+  {
+    "_id": "env_localhost",
+    "name": "Localhost",
+    "default": false,
+    "sortNum": 20000,
+    "created": "2025-11-05T00:00:00.000Z",
+    "modified": "2025-11-05T00:00:00.000Z",
+    "data": [
+      {
+        "name": "BASE_URL",
+        "value": "http://localhost:3000"
+      },
+      {
+        "name": "HOST",
+        "value": "localhost"
+      },
+      {
+        "name": "PORT",
+        "value": "3000"
+      }
+    ]
+  }
+]
