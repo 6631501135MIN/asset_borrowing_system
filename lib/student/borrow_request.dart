@@ -2,6 +2,10 @@
 // File: lib/student/borrow_request.dart
 // ==========================================
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../services/api_service.dart';
+import '../services/session_manager.dart';
+import '../models/borrow_request_model.dart';
 
 class StudentBorrowRequests extends StatefulWidget {
   const StudentBorrowRequests({super.key});
@@ -12,20 +16,122 @@ class StudentBorrowRequests extends StatefulWidget {
 
 class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
   int _selectedIndex = 0;
+  bool _isLoading = true;
+  List<BorrowRequest> _requests = [];
+  List<BorrowRequest> _filteredRequests = [];
+  String _searchQuery = '';
+  String? _userName;
+  final DateFormat _dateFormatter = DateFormat('dd MMM yyyy');
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+    _loadRequests();
+  }
+
+  Future<void> _loadUserData() async {
+    final fullName = await SessionManager.getFullName();
+    setState(() {
+      _userName = fullName;
+    });
+  }
+
+  Future<void> _loadRequests() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final userId = await SessionManager.getUserId();
+      
+      if (userId == null || userId == 0) {
+        if (!mounted) return;
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Session expired. Please login again.'),
+              ],
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+        
+        Navigator.pushReplacementNamed(context, '/student-login');
+        return;
+      }
+
+      final data = await ApiService.fetchStudentRequests(userId);
+      
+      setState(() {
+        _requests = data.map((json) => BorrowRequest.fromJson(json)).toList();
+        _filteredRequests = _requests;
+        _isLoading = false;
+      });
+      
+      print('✅ Loaded ${_requests.length} borrow requests');
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.error_outline, color: Colors.white),
+              const SizedBox(width: 8),
+              Expanded(child: Text('Error loading requests: $e')),
+            ],
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _filterRequests(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        _filteredRequests = _requests;
+      } else {
+        _filteredRequests = _requests.where((request) {
+          return request.assetName.toLowerCase().contains(query.toLowerCase()) ||
+                 request.assetCode.toLowerCase().contains(query.toLowerCase()) ||
+                 request.categoryName.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
 
   void _onItemTapped(int index) {
     if (_selectedIndex == index) return; // avoid redundant rebuilds
     setState(() => _selectedIndex = index);
 
     switch (index) {
-      case 0: // Assets
-        Navigator.pushReplacementNamed(context, '/student-assets');
+      case 0: // Assets - go back to main asset list
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/student-assets',
+          (route) => false,
+        );
         break;
       case 1: // History
         Navigator.pushReplacementNamed(context, '/student-history');
         break;
-      case 2: // Home (no explicit student home; send to assets hub)
-        Navigator.pushReplacementNamed(context, '/student-assets');
+      case 2: // Home - go to assets list
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/student-assets',
+          (route) => false,
+        );
         break;
       case 3: // Profile
         Navigator.pushReplacementNamed(context, '/student-profile');
@@ -45,9 +151,9 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Hello Min Maung!',
-                    style: TextStyle(
+                  Text(
+                    'Hello ${_userName ?? "Student"}!',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
@@ -96,6 +202,7 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
                         child: SizedBox(
                           height: 40,
                           child: TextField(
+                            onChanged: _filterRequests,
                             decoration: InputDecoration(
                               hintText: 'Search Asset',
                               hintStyle: TextStyle(
@@ -127,60 +234,61 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
                       ),
                     ),
                     Expanded(
-                      child: ListView(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                        children: [
-                          _buildRequestCard(
-                            icon: Icons.laptop_outlined,
-                            title: 'Macbook Air M3',
-                            id: 'Mac-1',
-                            from: '20 Nov 2025',
-                            to: '27 Nov 2025',
-                            status: 'Pending',
-                            statusColor: const Color(0xFFFFB020),
-                          ),
-                          const SizedBox(height: 12),
-                          _buildRequestCard(
-                            icon: Icons.tablet_mac_outlined,
-                            title: 'iPad Pro M4',
-                            id: 'iPad-1',
-                            from: '20 Nov 2025',
-                            to: '21 Nov 2025',
-                            status: 'Rejected',
-                            statusColor: Colors.red,
-                          ),
-                          const SizedBox(height: 12),
-                          _buildRequestCard(
-                            icon: Icons.vrpano_outlined,
-                            title: 'VR Headset',
-                            id: 'VR-1',
-                            from: '20 Nov 2025',
-                            to: '23 Nov 2025',
-                            status: 'Approved',
-                            statusColor: Colors.green,
-                          ),
-                          const SizedBox(height: 12),
-                          _buildRequestCard(
-                            icon: Icons.headphones_outlined,
-                            title: 'Sony WH-1000XM5',
-                            id: 'HP-1',
-                            from: '22 Nov 2025',
-                            to: '25 Nov 2025',
-                            status: 'Pending',
-                            statusColor: const Color(0xFFFFB020),
-                          ),
-                          const SizedBox(height: 12),
-                          _buildRequestCard(
-                            icon: Icons.camera_alt_outlined,
-                            title: 'Canon EOS R5',
-                            id: 'CAM-1',
-                            from: '23 Nov 2025',
-                            to: '30 Nov 2025',
-                            status: 'Approved',
-                            statusColor: Colors.green,
-                          ),
-                        ],
-                      ),
+                      child: _isLoading
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: Color(0xFF1a2b5a),
+                              ),
+                            )
+                          : _filteredRequests.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.inbox_outlined,
+                                        size: 64,
+                                        color: Colors.grey[400],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        _searchQuery.isEmpty
+                                            ? 'No borrow requests yet'
+                                            : 'No requests found',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      if (_searchQuery.isEmpty) ...[
+                                        const SizedBox(height: 8),
+                                        TextButton.icon(
+                                          onPressed: () {
+                                            Navigator.pushReplacementNamed(
+                                                context, '/student-assets');
+                                          },
+                                          icon: const Icon(Icons.add),
+                                          label: const Text('Borrow an Asset'),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                )
+                              : RefreshIndicator(
+                                  onRefresh: _loadRequests,
+                                  color: const Color(0xFF1a2b5a),
+                                  child: ListView.separated(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                                    itemCount: _filteredRequests.length,
+                                    separatorBuilder: (context, index) =>
+                                        const SizedBox(height: 12),
+                                    itemBuilder: (context, index) {
+                                      final request = _filteredRequests[index];
+                                      return _buildRequestCard(request);
+                                    },
+                                  ),
+                                ),
                     ),
                   ],
                 ),
@@ -209,15 +317,7 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
     );
   }
 
-  Widget _buildRequestCard({
-    required IconData icon,
-    required String title,
-    required String id,
-    required String from,
-    required String to,
-    required String status,
-    required Color statusColor,
-  }) {
+  Widget _buildRequestCard(BorrowRequest request) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -233,13 +333,49 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
       ),
       child: Row(
         children: [
+          // Use actual image from API instead of icon
           Container(
-            padding: const EdgeInsets.all(10),
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.10),
+              color: Colors.white.withOpacity(0.10),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: Colors.white, size: 28),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: request.getFixedImageUrl().isNotEmpty
+                  ? Image.network(
+                      request.getFixedImageUrl(),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Fallback to icon if image fails to load
+                        return Icon(
+                          request.getCategoryIcon(),
+                          color: Colors.white,
+                          size: 28,
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                            strokeWidth: 2,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.white),
+                          ),
+                        );
+                      },
+                    )
+                  : Icon(
+                      request.getCategoryIcon(),
+                      color: Colors.white,
+                      size: 28,
+                    ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -247,7 +383,7 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  request.assetName,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -256,7 +392,7 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'ID: $id',
+                  'ID: ${request.assetCode}',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.75),
                     fontSize: 12,
@@ -264,7 +400,7 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
                 ),
                 const SizedBox(height: 1),
                 Text(
-                  'From: $from',
+                  'From: ${_dateFormatter.format(request.borrowDate)}',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.75),
                     fontSize: 12,
@@ -272,7 +408,7 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
                 ),
                 const SizedBox(height: 1),
                 Text(
-                  'To: $to',
+                  'To: ${_dateFormatter.format(request.returnDate)}',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.75),
                     fontSize: 12,
@@ -282,9 +418,9 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
             ),
           ),
           Text(
-            status,
+            request.getStatusDisplay(),
             style: TextStyle(
-              color: statusColor,
+              color: request.getStatusColor(),
               fontSize: 14,
               fontWeight: FontWeight.w700,
             ),

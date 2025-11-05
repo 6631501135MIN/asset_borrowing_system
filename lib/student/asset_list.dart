@@ -1,8 +1,11 @@
 // ==========================================
 // File: lib/student/asset_list.dart
-// StudentAssetList (Figma-style)
+// StudentAssetList (Figma-style) - Dynamic
 // ==========================================
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
+import '../services/session_manager.dart';
+import '../models/category_model.dart';
 
 class StudentAssetList extends StatefulWidget {
   const StudentAssetList({super.key});
@@ -14,6 +17,72 @@ class StudentAssetList extends StatefulWidget {
 class _StudentAssetListState extends State<StudentAssetList> {
   int _selectedIndex = 0;
   final TextEditingController _search = TextEditingController();
+  String? _userName;
+  
+  List<Category> _categories = [];
+  List<Category> _filteredCategories = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+    _fetchCategories();
+    _search.addListener(_filterCategories);
+  }
+
+  Future<void> _loadUserData() async {
+    final firstName = await SessionManager.getFirstName();
+    final lastName = await SessionManager.getLastName();
+    setState(() {
+      _userName = '$firstName $lastName'.trim();
+      if (_userName!.isEmpty) {
+        _userName = 'Student';
+      }
+    });
+  }
+
+  Future<void> _fetchCategories() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      print('🔄 Fetching categories from API...');
+      final data = await ApiService.fetchCategories();
+      print('✅ Received ${data.length} categories');
+      
+      final categories = data.map((json) => Category.fromJson(json)).toList();
+      print('📦 Categories: ${categories.map((c) => c.name).join(', ')}');
+      
+      setState(() {
+        _categories = categories;
+        _filteredCategories = categories;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('❌ Error fetching categories: $e');
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _filterCategories() {
+    final query = _search.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _filteredCategories = _categories;
+      } else {
+        _filteredCategories = _categories
+            .where((category) => category.name.toLowerCase().contains(query))
+            .toList();
+      }
+    });
+  }
 
   void _onItemTapped(int index) {
     if (_selectedIndex == index) return;
@@ -21,13 +90,14 @@ class _StudentAssetListState extends State<StudentAssetList> {
 
     switch (index) {
       case 0:
-        Navigator.pushReplacementNamed(context, '/student-assets');
+        // Already on assets page - do nothing or reload
         break;
       case 1:
         Navigator.pushReplacementNamed(context, '/student-history');
         break;
       case 2:
-        Navigator.pushReplacementNamed(context, '/student-assets');
+        // Home - refresh current page
+        _fetchCategories();
         break;
       case 3:
         Navigator.pushReplacementNamed(context, '/student-profile');
@@ -53,10 +123,10 @@ class _StudentAssetListState extends State<StudentAssetList> {
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   Text(
-                    'Hello Min Maung!',
-                    style: TextStyle(
+                    'Hello ${_userName ?? "Student"}!',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
@@ -155,69 +225,8 @@ class _StudentAssetListState extends State<StudentAssetList> {
                     Expanded(
                       child: Stack(
                         children: [
-                          ListView(
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
-                            children: [
-                              // Macbook → menu first
-                              InkWell(
-                                onTap: () => Navigator.pushNamed(context, '/student-asset-menu'),
-                                borderRadius: BorderRadius.circular(16),
-                                child: _assetCard(
-                                  icon: Icons.laptop_outlined,
-                                  title: 'Macbook',
-                                  status: 'Available',
-                                  statusColor: const Color(0xFF4CAF50),
-                                  isDisabled: false,
-                                ),
-                              ),
-                              const SizedBox(height: 14),
-
-                              // iPad
-                              InkWell(
-                                onTap: () => Navigator.pushNamed(
-                                  context,
-                                  '/student-borrow',
-                                  arguments: {'id': 'ST-IPAD'},
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                                child: _assetCard(
-                                  icon: Icons.tablet_mac_outlined,
-                                  title: 'iPad',
-                                  status: 'Available',
-                                  statusColor: const Color(0xFF4CAF50),
-                                  isDisabled: false,
-                                ),
-                              ),
-                              const SizedBox(height: 14),
-
-                              // Playstation
-                              InkWell(
-                                onTap: () => Navigator.pushNamed(
-                                  context,
-                                  '/student-borrow',
-                                  arguments: {'id': 'ST-PS'},
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                                child: _assetCard(
-                                  icon: Icons.sports_esports_outlined,
-                                  title: 'Playstation',
-                                  status: 'Available',
-                                  statusColor: const Color(0xFF4CAF50),
-                                  isDisabled: false,
-                                ),
-                              ),
-                              const SizedBox(height: 14),
-
-                              // VR Headset (disabled)
-                              _assetCard(
-                                icon: Icons.vrpano_outlined,
-                                title: 'VR Headset',
-                                status: 'Disable',
-                                statusColor: const Color(0xFFD32F2F),
-                                isDisabled: true,
-                              ),
-                            ],
-                          ),
+                          // Loading, Error, or Content
+                          _buildContent(),
 
                           // Floating "Check Requests" pill
                           Positioned(
@@ -265,13 +274,143 @@ class _StudentAssetListState extends State<StudentAssetList> {
     );
   }
 
+  // Build content based on loading/error/data state
+  Widget _buildContent() {
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1a2b5a)),
+        ),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.red, size: 48),
+              const SizedBox(height: 16),
+              const Text(
+                'Error loading categories',
+                style: TextStyle(
+                  color: Color(0xFF1a2b5a),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.shade200),
+                ),
+                child: Text(
+                  _errorMessage!,
+                  style: TextStyle(
+                    color: Colors.red.shade900,
+                    fontSize: 13,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _fetchCategories,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1a2b5a),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_filteredCategories.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.search_off, color: Colors.grey, size: 48),
+            const SizedBox(height: 16),
+            Text(
+              _search.text.isEmpty ? 'No categories available' : 'No matching categories',
+              style: const TextStyle(
+                color: Color(0xFF1a2b5a),
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _fetchCategories,
+      color: const Color(0xFF1a2b5a),
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+        itemCount: _filteredCategories.length,
+        itemBuilder: (context, index) {
+          final category = _filteredCategories[index];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: _buildCategoryCard(category),
+          );
+        },
+      ),
+    );
+  }
+
+  // Build individual category card
+  Widget _buildCategoryCard(Category category) {
+    final isDisabled = category.isDisabled;
+    final imageUrl = category.getImageUrl();
+    
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    print('🎨 Building card for: ${category.name}');
+    print('📁 Image filename: ${category.image}');
+    print('🌐 Full URL: $imageUrl');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    
+    return InkWell(
+      onTap: isDisabled ? null : () {
+        // Navigate to asset menu with category info
+        Navigator.pushNamed(
+          context,
+          '/student-asset-menu',
+          arguments: {
+            'categoryId': category.categoryId,
+            'name': category.name,
+          },
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: _assetCard(
+        title: category.name,
+        status: isDisabled ? 'Disable' : 'Available',
+        statusColor: isDisabled ? const Color(0xFFD32F2F) : const Color(0xFF4CAF50),
+        isDisabled: isDisabled,
+        imageUrl: imageUrl,
+      ),
+    );
+  }
+
   // Reusable card styled to match the screenshot
   Widget _assetCard({
-    required IconData icon,
     required String title,
     required String status,
     required Color statusColor,
     required bool isDisabled,
+    String? imageUrl,
   }) {
     final Color bg = isDisabled ? const Color(0xFF8D8D92) : const Color(0xFF132552);
 
@@ -286,13 +425,58 @@ class _StudentAssetListState extends State<StudentAssetList> {
       ),
       child: Row(
         children: [
+          // Use image from backend, fallback to icon
           Container(
-            padding: const EdgeInsets.all(10),
+            width: 60,
+            height: 60,
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.10),
-              borderRadius: BorderRadius.circular(10),
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: Colors.white, size: 26),
+            child: imageUrl != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Show placeholder if image fails to load
+                        print('❌ Image failed to load: $imageUrl');
+                        print('Error: $error');
+                        return const Center(
+                          child: Icon(
+                            Icons.broken_image_outlined,
+                            color: Colors.white54,
+                            size: 32,
+                          ),
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          print('✅ Image loaded: $imageUrl');
+                          return child;
+                        }
+                        return Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white70),
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                : const Center(
+                    child: Icon(
+                      Icons.image_outlined,
+                      color: Colors.white54,
+                      size: 32,
+                    ),
+                  ),
           ),
           const SizedBox(width: 14),
           const SizedBox(width: 2),

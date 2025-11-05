@@ -1,6 +1,7 @@
-// lib/screens/lecturer_login_screen.dart
+// lib/screens/student_login_screen.dart
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/session_manager.dart';
 
 class StudentLoginScreen extends StatefulWidget {
   const StudentLoginScreen({super.key});
@@ -58,7 +59,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
     String? passErr;
 
     if (_usernameController.text.trim().isEmpty) {
-      userErr = 'Please enter your username';
+      userErr = 'Please enter your email or username';
     }
     if (_passwordController.text.isEmpty) {
       passErr = 'Please enter your password';
@@ -75,9 +76,18 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Call login API
+      final credential = _usernameController.text.trim();
+      
+      // Determine if the credential is an email, username, or UID
+      // Email contains '@', UID is all digits, otherwise it's username
+      final bool isEmail = credential.contains('@');
+      final bool isUid = RegExp(r'^\d+$').hasMatch(credential);
+      
+      // Call login API with the appropriate field
       final result = await ApiService.login(
-        username: _usernameController.text.trim(),
+        email: isEmail ? credential : null,
+        username: (!isEmail && !isUid) ? credential : null,
+        uid: isUid ? credential : null,
         password: _passwordController.text,
       );
 
@@ -89,6 +99,55 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
       if (result['success'] == true) {
         // Login successful
         final userData = result['data'];
+        
+        // Debug: Print entire API response
+        print('🔍 Login API Response: $userData');
+        
+        // Extract user information from API response
+        // API may return 'user_id' OR 'uid' - handle both cases
+        final int userId = (userData['user_id'] ?? userData['uid'] ?? 0) as int;
+        final String uid = userData['uid']?.toString() ?? '';
+        final String username = userData['username'] ?? '';
+        final String email = userData['email'] ?? '';
+        final String firstName = userData['first_name'] ?? '';
+        final String lastName = userData['last_name'] ?? '';
+        final String role = userData['role'] ?? '';
+        final String? token = userData['token'];
+        
+        print('🔍 Extracted userId: $userId (type: ${userId.runtimeType})');
+        print('🔍 userData[user_id]: ${userData['user_id']}');
+        print('🔍 userData[uid]: ${userData['uid']}');
+        
+        // Validate that we got a valid user ID
+        if (userId == 0) {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.error_outline, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text('Login error: Invalid user ID from server. Check backend API.'),
+                ],
+              ),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 4),
+            ),
+          );
+          return;
+        }
+        
+        // Save session to local storage
+        await SessionManager.saveSession(
+          userId: userId,
+          uid: uid,
+          username: username,
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          role: role,
+          token: token,
+        );
         
         // Show welcome alert dialog
         await showDialog(
@@ -115,7 +174,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                 ],
               ),
               content: Text(
-                'Welcome back, ${userData['first_name'] ?? 'User'}!\nLogin successful.',
+                'Welcome back, $firstName $lastName!\nRole: $role\nLogin successful.',
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 16,
@@ -152,10 +211,21 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
 
         if (!mounted) return;
 
-        // Navigate to asset list
-        Navigator.pushReplacementNamed(context, '/student-assets');
+        // Navigate based on user role
+        // The API returns role field which could be 'student', 'lecturer', or 'staff'
+        if (role.toLowerCase() == 'student') {
+          Navigator.pushReplacementNamed(context, '/student-assets');
+        } else if (role.toLowerCase() == 'lecturer') {
+          Navigator.pushReplacementNamed(context, '/lecturer-assets');
+        } else if (role.toLowerCase() == 'staff') {
+          Navigator.pushReplacementNamed(context, '/staff-assets');
+        } else {
+          // Default fallback
+          Navigator.pushReplacementNamed(context, '/student-assets');
+        }
       } else {
         // Login failed - show error
+        // API returns plain text error messages: "Wrong username" or "Wrong password"
         final errorMessage = result['message'] ?? 'Login failed';
         
         ScaffoldMessenger.of(context).showSnackBar(

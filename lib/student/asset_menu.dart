@@ -1,8 +1,11 @@
 // ==========================================
 // File: lib/student/asset_menu.dart
-// (renamed from your BorrowRequest-style screen)
+// Dynamic asset list by category
 // ==========================================
 import 'package:flutter/material.dart';
+import '../models/asset_model.dart';
+import '../services/api_service.dart';
+import '../services/session_manager.dart';
 
 class StudentAssetMenu extends StatefulWidget {
   const StudentAssetMenu({super.key});
@@ -13,6 +16,66 @@ class StudentAssetMenu extends StatefulWidget {
 
 class _StudentAssetMenuState extends State<StudentAssetMenu> {
   int _selectedIndex = 0;
+  List<Asset> _assets = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+  String? _userName;
+  int? _categoryId;
+  String _categoryName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final firstName = await SessionManager.getFirstName();
+    final lastName = await SessionManager.getLastName();
+    setState(() {
+      _userName = '$firstName $lastName'.trim();
+      if (_userName!.isEmpty) {
+        _userName = 'Student';
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Get category info from route arguments
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null) {
+      _categoryId = args['categoryId'] as int?;
+      _categoryName = args['name'] as String? ?? '';
+      if (_categoryId != null) {
+        _fetchAssets();
+      }
+    }
+  }
+
+  Future<void> _fetchAssets() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final data = await ApiService.fetchAssetsByCategory(_categoryId!);
+      setState(() {
+        _assets = data.map((json) => Asset.fromJson(json)).toList();
+        _isLoading = false;
+      });
+      
+      print('✅ Loaded ${_assets.length} assets for category $_categoryName');
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+      print('❌ Error loading assets: $e');
+    }
+  }
 
   void _onItemTapped(int index) {
     if (_selectedIndex == index) return;
@@ -20,14 +83,22 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
 
     // Navigate using student routes defined in main.dart
     switch (index) {
-      case 0: // Assets (acts as home list)
-        Navigator.pushReplacementNamed(context, '/student-assets');
+      case 0: // Assets - go back to main asset list
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/student-assets',
+          (route) => false,
+        );
         break;
       case 1: // History
         Navigator.pushReplacementNamed(context, '/student-history');
         break;
-      case 2: // Home -> use assets as home
-        Navigator.pushReplacementNamed(context, '/student-assets');
+      case 2: // Home -> go to assets list
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/student-assets',
+          (route) => false,
+        );
         break;
       case 3: // Profile
         Navigator.pushReplacementNamed(context, '/student-profile');
@@ -47,9 +118,9 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Hello Min Maung!',
-                    style: TextStyle(
+                  Text(
+                    'Hello ${_userName ?? "Student"}!',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
@@ -106,9 +177,9 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
                             onPressed: () => Navigator.pop(context),
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Asset List Macbook',
-                            style: TextStyle(
+                          Text(
+                            'Asset List - $_categoryName',
+                            style: const TextStyle(
                               color: Color.fromARGB(255, 12, 24, 81),
                               fontSize: 24,
                               fontWeight: FontWeight.w700,
@@ -118,86 +189,7 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
                       ),
                       const SizedBox(height: 12),
                       Expanded(
-                        child: ListView(
-                          padding: const EdgeInsets.all(16),
-                          children: [
-                            // ✅ wrap each card to navigate to borrow page
-                            InkWell(
-                              onTap: () => Navigator.pushNamed(
-                                context,
-                                '/student-borrow',
-                                arguments: {'id': 'Mac-1'},
-                              ),
-                              child: requestCard(
-                                icon: Icons.laptop_outlined,
-                                title: 'Macbook Pro M1',
-                                id: 'Mac-1',
-                                status: 'Available',
-                                statusColor: const Color.fromRGBO(
-                                  76,
-                                  175,
-                                  80,
-                                  1,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            InkWell(
-                              onTap: () => Navigator.pushNamed(
-                                context,
-                                '/student-borrow',
-                                arguments: {'id': 'Mac-2'},
-                              ),
-                              child: requestCard(
-                                icon: Icons.laptop_outlined,
-                                title: 'Macbook Pro',
-                                id: 'Mac-2',
-                                status: 'Pending',
-                                statusColor: const Color.fromARGB(
-                                  255,
-                                  253,
-                                  244,
-                                  85,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            InkWell(
-                              onTap: () => Navigator.pushNamed(
-                                context,
-                                '/student-borrow',
-                                arguments: {'id': 'Mac-3'},
-                              ),
-                              child: requestCard(
-                                icon: Icons.laptop_outlined,
-                                title: 'Macbook Pro',
-                                id: 'Mac-3',
-                                status: 'Disable',
-                                statusColor: const Color.fromARGB(
-                                  255,
-                                  255,
-                                  64,
-                                  64,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            InkWell(
-                              onTap: () => Navigator.pushNamed(
-                                context,
-                                '/student-borrow',
-                                arguments: {'id': 'Mac-4'},
-                              ),
-                              child: requestCard(
-                                icon: Icons.headphones_outlined,
-                                title: 'Macbook Air M2',
-                                id: 'Mac-4',
-                                status: 'Borrowed',
-                                statusColor: const Color(0xFFFFB020),
-                              ),
-                            ),
-                          ],
-                        ),
+                        child: _buildContent(),
                       ),
                     ],
                   ),
@@ -229,15 +221,109 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
     );
   }
 
-  // Card UI
-  Widget requestCard({
-    required IconData icon,
-    required String title,
-    required String id,
-    required String status,
-    required Color statusColor,
-  }) {
-    final Color backgroundColor = status.toLowerCase() == 'disable'
+  // Build content based on loading state
+  Widget _buildContent() {
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1a2b5a)),
+        ),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, color: Colors.red, size: 48),
+            const SizedBox(height: 16),
+            Text(
+              'Error loading assets',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _errorMessage!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _fetchAssets,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1a2b5a),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_assets.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.inbox_outlined, color: Colors.grey, size: 48),
+            const SizedBox(height: 16),
+            Text(
+              'No assets available',
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'There are no $_categoryName assets at the moment',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _fetchAssets,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: _assets.length,
+        itemBuilder: (context, index) {
+          final asset = _assets[index];
+          return Padding(
+            padding: EdgeInsets.only(bottom: index < _assets.length - 1 ? 12 : 0),
+            child: InkWell(
+              onTap: asset.isAvailable
+                  ? () {
+                      Navigator.pushNamed(
+                        context,
+                        '/student-borrow',
+                        arguments: {
+                          'id': asset.assetCode,
+                          'name': asset.assetName,
+                          'assetId': asset.assetId,
+                          'categoryName': asset.categoryName,
+                          'imageUrl': asset.getImageUrl(),
+                        },
+                      );
+                    }
+                  : null,
+              borderRadius: BorderRadius.circular(16),
+              child: _buildAssetCard(asset),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Build individual asset card
+  Widget _buildAssetCard(Asset asset) {
+    final imageUrl = asset.getImageUrl();
+    final statusColor = asset.getStatusColor();
+    final isDisabled = !asset.isAvailable;
+    final Color backgroundColor = isDisabled
         ? const Color.fromARGB(255, 100, 100, 100)
         : const Color(0xFF1a2b5a);
 
@@ -257,13 +343,40 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Category image
           Container(
-            padding: const EdgeInsets.all(10),
+            width: 60,
+            height: 60,
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.10),
-              borderRadius: BorderRadius.circular(10),
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: Colors.white, size: 28),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Center(
+                    child: Icon(
+                      Icons.broken_image_outlined,
+                      color: Colors.white54,
+                      size: 32,
+                    ),
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white70),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -271,7 +384,7 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  asset.assetName,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -280,15 +393,16 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'ID: $id',
+                  'ID: ${asset.assetCode}',
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$status',
+                  asset.status.toUpperCase(),
                   style: TextStyle(
                     color: statusColor,
                     fontSize: 14,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],

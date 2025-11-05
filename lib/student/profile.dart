@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/session_manager.dart';
 
 class StudentProfile extends StatefulWidget {
   const StudentProfile({super.key});
@@ -8,6 +9,96 @@ class StudentProfile extends StatefulWidget {
 }
 
 class _StudentProfileState extends State<StudentProfile> {
+  String _fullName = 'Loading...';
+  String _email = 'Loading...';
+  String _username = 'Loading...';
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final userData = await SessionManager.getUserData();
+      
+      setState(() {
+        _fullName = '${userData['firstName'] ?? ''} ${userData['lastName'] ?? ''}'.trim();
+        _email = userData['email'] ?? 'No email';
+        _username = userData['username'] ?? 'No username';
+        _isLoading = false;
+      });
+      
+      print('✅ Profile loaded for: $_fullName');
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print('❌ Error loading profile: $e');
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    // Show confirmation dialog
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF0E1939),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: const Text(
+          'Logout',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text(
+              'Logout',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      // Clear session
+      await SessionManager.clearSession();
+      
+      if (!mounted) return;
+      
+      // Navigate to login
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/student-login',
+        (route) => false,
+      );
+      
+      // Show logout message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Logged out successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,15 +136,22 @@ class _StudentProfileState extends State<StudentProfile> {
                 child: CircleAvatar(
                   radius: 35,
                   backgroundColor: const Color(0xFF081038),
-                  backgroundImage: const NetworkImage(
-                    'https://dehraflicks.com/wp-content/uploads/2025/07/person-icon-bg-png-dehraflicks.png',
-                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                          _fullName.isNotEmpty ? _fullName[0].toUpperCase() : 'U',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 15),
-              const Text(
-                'John Smith',
-                style: TextStyle(color: Colors.white, fontSize: 18),
+              Text(
+                _fullName,
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               Container(
@@ -70,15 +168,15 @@ class _StudentProfileState extends State<StudentProfile> {
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           'Username',
                           style: TextStyle(color: Colors.white54, fontSize: 10),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          'John01',
-                          style: TextStyle(color: Colors.white, fontSize: 14),
+                          _username,
+                          style: const TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       ],
                     ),
@@ -100,15 +198,15 @@ class _StudentProfileState extends State<StudentProfile> {
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           'Email',
                           style: TextStyle(color: Colors.white54, fontSize: 10),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          'john@gmail.com',
-                          style: TextStyle(color: Colors.white, fontSize: 14),
+                          _email,
+                          style: const TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       ],
                     ),
@@ -179,103 +277,29 @@ class _StudentProfileState extends State<StudentProfile> {
                 ),
               ),
               const SizedBox(height: 40),
+              
+              // Logout Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          backgroundColor: const Color(0xFF1a2b5a),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          title: const Center(
-                            child: Text(
-                              'Are you sure to Log Out?',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                          content: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  Navigator.pushNamedAndRemoveUntil(
-                                    this.context,
-                                    '/student-login', // student login
-                                    (route) => false,
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 30,
-                                    vertical: 3,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'YES',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 30,
-                                    vertical: 3,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'NO',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
+                child: ElevatedButton.icon(
+                  onPressed: _handleLogout,
+                  icon: const Icon(Icons.logout, color: Colors.white),
+                  label: const Text(
+                    'Logout',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'LOG OUT',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              
+              const SizedBox(height: 20),
               const Text(
                 'Version 1.0.1',
                 style: TextStyle(color: Colors.white54, fontSize: 12),

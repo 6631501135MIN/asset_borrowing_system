@@ -2,6 +2,7 @@
 // File: lib/student/borrower_history.dart
 // ==========================================
 import 'package:flutter/material.dart';
+import '../services/session_manager.dart';
 
 class BorrowerHistory extends StatefulWidget {
   const BorrowerHistory({super.key});
@@ -12,20 +13,45 @@ class BorrowerHistory extends StatefulWidget {
 
 class _BorrowerHistoryState extends State<BorrowerHistory> {
   int _selectedIndex = 1; // History tab selected
+  String? _userName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final firstName = await SessionManager.getFirstName();
+    final lastName = await SessionManager.getLastName();
+    setState(() {
+      _userName = '$firstName $lastName'.trim();
+      if (_userName!.isEmpty) {
+        _userName = 'Student';
+      }
+    });
+  }
 
   void _onItemTapped(int index) {
     if (_selectedIndex == index) return;
     setState(() => _selectedIndex = index);
     switch (index) {
-      case 0:
-        Navigator.pushReplacementNamed(context, '/student-assets');
+      case 0: // Assets - go back to main asset list
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/student-assets',
+          (route) => false,
+        );
         break;
       case 1:
         // stay on History
         break;
-      case 2:
-        // No explicit student "home" route; send to assets as the home hub
-        Navigator.pushReplacementNamed(context, '/student-assets');
+      case 2: // Home - go to assets list
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/student-assets',
+          (route) => false,
+        );
         break;
       case 3:
         Navigator.pushReplacementNamed(context, '/student-profile');
@@ -104,17 +130,17 @@ class _BorrowerHistoryState extends State<BorrowerHistory> {
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   Text(
-                    "Hello Min Maung!",
-                    style: TextStyle(
+                    "Hello ${_userName ?? "Student"}!",
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
                     ),
                   ),
-                  Icon(Icons.notifications_none, color: Colors.white, size: 26),
+                  const Icon(Icons.notifications_none, color: Colors.white, size: 26),
                 ],
               ),
             ),
