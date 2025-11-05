@@ -1,5 +1,6 @@
 // lib/screens/lecturer_login_screen.dart
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
 class StudentLoginScreen extends StatefulWidget {
   const StudentLoginScreen({super.key});
@@ -14,6 +15,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
   final _passwordController = TextEditingController();
   final _passwordFocus = FocusNode();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   String? _usernameError; // outside-the-box validator message
   String? _passwordError; // outside-the-box validator message
@@ -49,7 +51,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  void _handleLogin() async {
     if (_formKey.currentState == null) return;
 
     String? userErr;
@@ -69,8 +71,121 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
 
     if (userErr != null || passErr != null) return;
 
-    if (!mounted) return;
-    Navigator.pushReplacementNamed(context, '/student-assets');
+    // Show loading state
+    setState(() => _isLoading = true);
+
+    try {
+      // Call login API
+      final result = await ApiService.login(
+        username: _usernameController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      // Hide loading state
+      setState(() => _isLoading = false);
+
+      if (!mounted) return;
+
+      if (result['success'] == true) {
+        // Login successful
+        final userData = result['data'];
+        
+        // Show welcome alert dialog
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF0E1939),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: const Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 28),
+                  SizedBox(width: 12),
+                  Text(
+                    'Welcome!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              content: Text(
+                'Welcome back, ${userData['first_name'] ?? 'User'}!\nLogin successful.',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close dialog
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(0xFF1D2965),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Continue',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (!mounted) return;
+
+        // Navigate to asset list
+        Navigator.pushReplacementNamed(context, '/student-assets');
+      } else {
+        // Login failed - show error
+        final errorMessage = result['message'] ?? 'Login failed';
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // Handle unexpected errors
+      setState(() => _isLoading = false);
+      
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      );
+    }
   }
 
   BoxDecoration _boxDecoration(BuildContext context) => BoxDecoration(
@@ -194,27 +309,40 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                       // Login button
                       InkWell(
                         borderRadius: BorderRadius.circular(8),
-                        onTap: _handleLogin,
+                        onTap: _isLoading ? null : _handleLogin,
                         child: Ink(
                           width: 120,
                           decoration: _boxDecoration(context).copyWith(
-                            color: const Color(0xFF1D2965),
+                            color: _isLoading 
+                                ? const Color(0xFF1D2965).withOpacity(0.6)
+                                : const Color(0xFF1D2965),
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
                             ),
                             child: Center(
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.6,
-                                ),
-                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white,
+                                        ),
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.6,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),

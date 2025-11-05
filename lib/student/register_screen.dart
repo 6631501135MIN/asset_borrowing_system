@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
 class StudentRegisterScreen extends StatefulWidget {
   const StudentRegisterScreen({super.key});
@@ -11,20 +12,25 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _firstName = TextEditingController();
-  final _lastName  = TextEditingController();
-  final _username  = TextEditingController();
-  final _email     = TextEditingController();
-  final _password  = TextEditingController();
-  final _confirm   = TextEditingController();
-  final _phone     = TextEditingController();
+  final _lastName = TextEditingController();
+  final _username = TextEditingController();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  final _confirm = TextEditingController();
+  final _phone = TextEditingController();
 
   bool _obscurePwd = true;
   bool _obscureCfm = true;
+  bool _isLoading = false;
 
   // === Colors copied from login ===
-  static const Color _bg       = Color(0xFF0C1851); // page background
-  static const Color _boxFill  = Color(0xFF081038); // input box fill (from login)
-  static const Color _ctaFill  = Color(0xFF1D2965); // login button color (reuse here)
+  static const Color _bg = Color(0xFF0C1851); // page background
+  static const Color _boxFill = Color(
+    0xFF081038,
+  ); // input box fill (from login)
+  static const Color _ctaFill = Color(
+    0xFF1D2965,
+  ); // login button color (reuse here)
 
   @override
   void dispose() {
@@ -38,18 +44,69 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
     super.dispose();
   }
 
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      Navigator.pushNamedAndRemoveUntil(context, '/student-assets', (r) => false);
+  void _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    // Show loading indicator
+    setState(() => _isLoading = true);
+
+    try {
+      // Call the API
+      final result = await ApiService.register(
+        email: _email.text.trim(),
+        password: _password.text,
+        firstName: _firstName.text.trim(),
+        lastName: _lastName.text.trim(),
+        username: _username.text.trim(),
+        phoneNumber: _phone.text.trim().isNotEmpty ? _phone.text.trim() : null,
+      );
+
+      // Hide loading indicator
+      setState(() => _isLoading = false);
+
+      if (!mounted) return;
+
+      if (result['success'] == true) {
+        // Registration successful
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registration successful! Please login.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate to login screen
+        Navigator.pushReplacementNamed(context, '/student-login');
+      } else {
+        // Registration failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? 'Registration failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      // Handle any unexpected errors
+      setState(() => _isLoading = false);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
   // EXACT same box style as login
   BoxDecoration _boxDecoration() => BoxDecoration(
-        color: _boxFill,
-        border: Border.all(color: Colors.white.withOpacity(0.3)),
-        borderRadius: BorderRadius.circular(8),
-      );
+    color: _boxFill,
+    border: Border.all(color: Colors.white.withOpacity(0.3)),
+    borderRadius: BorderRadius.circular(8),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +147,9 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                             controller: _firstName,
                             hintText: 'First Name',
                             prefixIcon: Icons.badge_outlined,
-                            validator: (v) =>
-                                (v == null || v.trim().isEmpty) ? 'Required' : null,
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Required'
+                                : null,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -100,8 +158,9 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                             controller: _lastName,
                             hintText: 'Last Name',
                             prefixIcon: Icons.badge_outlined,
-                            validator: (v) =>
-                                (v == null || v.trim().isEmpty) ? 'Required' : null,
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Required'
+                                : null,
                           ),
                         ),
                       ],
@@ -156,7 +215,8 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                           setState(() => _obscureCfm = !_obscureCfm),
                       validator: (v) {
                         if (v == null || v.isEmpty) return 'Required';
-                        if (v != _password.text) return 'Passwords do not match';
+                        if (v != _password.text)
+                          return 'Passwords do not match';
                         return null;
                       },
                     ),
@@ -179,24 +239,38 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                       width: double.infinity,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(10),
-                        onTap: _submit,
+                        onTap: _isLoading ? null : _submit,
                         child: Ink(
                           decoration: _boxDecoration().copyWith(
-                            color: _ctaFill,
+                            color: _isLoading
+                                ? _ctaFill.withOpacity(0.6)
+                                : _ctaFill,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 14),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                             child: Center(
-                              child: Text(
-                                'REGISTER',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  letterSpacing: 1.0,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
+                                      ),
+                                    )
+                                  : const Text(
+                                      'REGISTER',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        letterSpacing: 1.0,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
@@ -272,8 +346,10 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                   fontWeight: FontWeight.w300,
                 ),
                 prefixText: prefixText,
-                prefixStyle:
-                    const TextStyle(color: Colors.white70, fontSize: 14),
+                prefixStyle: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
                 // eye icon for passwords (right side)
                 suffixIcon: isPassword
                     ? IconButton(
@@ -287,8 +363,10 @@ class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
                         ),
                       )
                     : null,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 0, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 0,
+                  vertical: 14,
+                ),
               ),
             ),
           ),
