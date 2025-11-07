@@ -112,9 +112,6 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
   }
 
   void _onItemTapped(int index) {
-    if (_selectedIndex == index) return; // avoid redundant rebuilds
-    setState(() => _selectedIndex = index);
-
     switch (index) {
       case 0: // Assets - go back to main asset list
         Navigator.pushNamedAndRemoveUntil(
@@ -124,7 +121,11 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
         );
         break;
       case 1: // History
-        Navigator.pushReplacementNamed(context, '/student-history');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/student-history',
+          (route) => false,
+        );
         break;
       case 2: // Home - go to assets list
         Navigator.pushNamedAndRemoveUntil(
@@ -134,7 +135,11 @@ class _StudentBorrowRequestsState extends State<StudentBorrowRequests> {
         );
         break;
       case 3: // Profile
-        Navigator.pushReplacementNamed(context, '/student-profile');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/student-profile',
+          (route) => false,
+        );
         break;
     }
   }

@@ -78,9 +78,6 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
   }
 
   void _onItemTapped(int index) {
-    if (_selectedIndex == index) return;
-    setState(() => _selectedIndex = index);
-
     // Navigate using student routes defined in main.dart
     switch (index) {
       case 0: // Assets - go back to main asset list
@@ -91,7 +88,11 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
         );
         break;
       case 1: // History
-        Navigator.pushReplacementNamed(context, '/student-history');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/student-history',
+          (route) => false,
+        );
         break;
       case 2: // Home -> go to assets list
         Navigator.pushNamedAndRemoveUntil(
@@ -101,7 +102,11 @@ class _StudentAssetMenuState extends State<StudentAssetMenu> {
         );
         break;
       case 3: // Profile
-        Navigator.pushReplacementNamed(context, '/student-profile');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/student-profile',
+          (route) => false,
+        );
         break;
     }
   }

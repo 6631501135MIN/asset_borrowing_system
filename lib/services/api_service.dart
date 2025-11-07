@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   // Updated to match your server's IP address
-  static const String baseUrl = 'http://192.168.1.185:3000/api';
+  // Updated to use the server IP you provided
+  static const String baseUrl = 'http://172.20.10.7:3000/api';
 
   // Alternative configurations (comment/uncomment as needed):
   // For Android emulator: use 10.0.2.2

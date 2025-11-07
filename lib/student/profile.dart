@@ -106,7 +106,7 @@ class _StudentProfileState extends State<StudentProfile> {
         backgroundColor: const Color(0xFF0C1851),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () {
             // Go to home (student assets) instead of popping
             Navigator.pushNamedAndRemoveUntil(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
 class BorrowRequest {
   final int borrowingId;
@@ -81,18 +82,24 @@ class BorrowRequest {
   // Fix image URL if needed (replace IP address)
   String getFixedImageUrl() {
     if (categoryImageUrl.isEmpty) return categoryImageUrl;
-    
-    // Replace any IP address with the correct one
-    final uri = Uri.parse(categoryImageUrl);
-    const correctIp = '192.168.1.185';
-    
-    if (uri.host != correctIp) {
-      return categoryImageUrl.replaceAll(
-        RegExp(r'http://[\d\.]+:'),
-        'http://$correctIp:',
-      );
+    // If the API baseUrl contains a host, rewrite any incoming image host to match it.
+    try {
+      final imgUri = Uri.parse(categoryImageUrl);
+      final apiUri = Uri.parse(ApiService.baseUrl);
+
+      // If hosts differ, replace host (and port) in the image URL with API host and port
+      if (imgUri.host != apiUri.host || imgUri.port != apiUri.port) {
+        final replaced = categoryImageUrl.replaceFirst(
+          RegExp(r'http://[\d\.]+(:\d+)?'),
+          '${apiUri.scheme}://${apiUri.host}:${apiUri.port}',
+        );
+        return replaced;
+      }
+    } catch (e) {
+      // On any parsing error, return the original URL so we don't break UI
+      return categoryImageUrl;
     }
-    
+
     return categoryImageUrl;
   }
 
