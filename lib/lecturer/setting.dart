@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asset_borrowing_system/services/api_service.dart';
 
 class Setting extends StatefulWidget {
   const Setting({super.key});
@@ -9,9 +10,75 @@ class Setting extends StatefulWidget {
 
 class _SettingState extends State<Setting> {
   bool notificationsEnabled = false;
+  bool _isLoading = true;
+  String? _error;
+
+  Map<String, dynamic> _appInfo = {};
+  Map<String, dynamic> _supportInfo = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSettings();
+  }
+
+  Future<void> _fetchSettings() async {
+    try {
+      final Map<String, dynamic> settings = await ApiService.fetchSettings();
+      setState(() {
+        notificationsEnabled = settings['notifications_enabled'] ?? false;
+        _appInfo = settings['app_info'] ?? {};
+        _supportInfo = settings['support_info'] ?? {};
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Failed to load settings: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _updateNotifications(bool value) async {
+    setState(() {
+      notificationsEnabled = value;
+    });
+    try {
+      await ApiService.updateSettings({'notifications_enabled': value});
+    } catch (e) {
+      setState(() {
+        notificationsEnabled = !value; // Revert on error
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update notifications: $e')));
+    }
+  }
+
+  Future<void> _deleteAccount() async {
+    try {
+      final result = await ApiService.deleteAccount();
+      if (result['success']) {
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'])));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete account: $e')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_error != null) {
+      return Scaffold(
+        body: Center(child: Text(_error!, style: const TextStyle(color: Colors.red))),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFF0C1851),
       appBar: AppBar(
@@ -57,11 +124,7 @@ class _SettingState extends State<Setting> {
                     scale: 0.8,
                     child: Switch(
                       value: notificationsEnabled,
-                      onChanged: (value) {
-                        setState(() {
-                          notificationsEnabled = value;
-                        });
-                      },
+                      onChanged: _updateNotifications,
                       activeColor: Colors.white,
                       activeTrackColor: Colors.white.withOpacity(0.5),
                       inactiveThumbColor: Colors.white,
@@ -93,6 +156,7 @@ class _SettingState extends State<Setting> {
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
+                          _deleteAccount();
                         },
                         child: const Text(
                           'Delete',
@@ -111,8 +175,8 @@ class _SettingState extends State<Setting> {
                 builder: (BuildContext context) {
                   return AlertDialog(
                     title: const Text('Contact Support'),
-                    content: const Text(
-                      'Email: support@example.com\nPhone: +66 012 345 6789',
+                    content: Text(
+                      'Email: ${_supportInfo['email'] ?? 'support@example.com'}\nPhone: ${_supportInfo['phone'] ?? '+66 012 345 6789'}',
                     ),
                     actions: [
                       TextButton(
@@ -133,8 +197,8 @@ class _SettingState extends State<Setting> {
                 builder: (BuildContext context) {
                   return AlertDialog(
                     title: const Text('About App'),
-                    content: const Text(
-                      'App Name: My App\nVersion: 1.0.1\nDeveloper: Your Company\n\nThank you for using our app!',
+                    content: Text(
+                      'App Name: ${_appInfo['name'] ?? 'My App'}\nVersion: ${_appInfo['version'] ?? '1.0.1'}\nDeveloper: ${_appInfo['developer'] ?? 'Your Company'}\n\nThank you for using our app!',
                     ),
                     actions: [
                       TextButton(
@@ -149,9 +213,9 @@ class _SettingState extends State<Setting> {
               );
             }),
             const Spacer(),
-            const Text(
-              'Version 1.0.1',
-              style: TextStyle(color: Colors.white54, fontSize: 12),
+            Text(
+              'Version ${_appInfo['version'] ?? '1.0.1'}',
+              style: const TextStyle(color: Colors.white54, fontSize: 12),
             ),
             const SizedBox(height: 20),
           ],
