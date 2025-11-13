@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asset_borrowing_system/services/api_service.dart';
 
 class LenderHistory extends StatefulWidget {
   const LenderHistory({super.key});
@@ -9,6 +10,44 @@ class LenderHistory extends StatefulWidget {
 
 class _LenderHistoryState extends State<LenderHistory> {
   int _selectedIndex = 1;
+
+  List<Map<String, dynamic>> _historyItems = [];
+  bool _isLoading = true;
+  String _query = '';
+
+  final TextEditingController _searchController = TextEditingController();
+
+  // Assume lecturerId is obtained from auth or passed; hardcoded for demo
+  final int _lecturerId = 1; // Replace with actual lecturer ID from context/auth
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHistory();
+  }
+
+  Future<void> _fetchHistory() async {
+    try {
+      final List<Map<String, dynamic>> apiHistory = await ApiService.fetchApprovalHistory(_lecturerId);
+      setState(() {
+        _historyItems = apiHistory;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load history: $e')));
+    }
+  }
+
+  IconData _getIconForTitle(String title) {
+    String lowerTitle = title.toLowerCase();
+    if (lowerTitle.contains('playstation')) return Icons.sports_esports_outlined;
+    if (lowerTitle.contains('vr')) return Icons.vrpano_outlined;
+    if (lowerTitle.contains('ipad')) return Icons.tablet_mac_outlined;
+    return Icons.device_unknown_outlined;
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -32,36 +71,17 @@ class _LenderHistoryState extends State<LenderHistory> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final historyItems = <Map<String, dynamic>>[
-      {
-        "name": "PlayStation 5",
-        "id": "PS5-1",
-        "from": "16 Nov 2025",
-        "to": "19 Nov 2025",
-        "approvedBy": "Min",
-        "status": "Approved",
-        "icon": Icons.sports_esports_outlined,
-      },
-      {
-        "name": "VR Headset",
-        "id": "VR-1",
-        "from": "11 Nov 2025",
-        "to": "11 Nov 2025",
-        "approvedBy": "Mink",
-        "status": "Rejected",
-        "icon": Icons.vrpano_outlined,
-      },
-      {
-        "name": "iPad Pro M2",
-        "id": "iPad-2",
-        "from": "8 Oct 2025",
-        "to": "10 Oct 2025",
-        "approvedBy": "Chalisa",
-        "status": "Approved",
-        "icon": Icons.tablet_mac_outlined,
-      },
-    ];
+    final filtered = _historyItems.where((item) {
+      String title = item['asset_name'] ?? '';
+      return title.toLowerCase().contains(_query.toLowerCase());
+    }).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFF0C1851),
@@ -115,31 +135,81 @@ class _LenderHistoryState extends State<LenderHistory> {
                     topRight: Radius.circular(30),
                   ),
                 ),
-                child: historyItems.isEmpty
-                    ? _buildEmptyState()
-                    : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: historyItems.length,
-                        itemBuilder: (context, index) {
-                          final item = historyItems[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: _buildHistoryCard(
-                              icon: item['icon'] as IconData,
-                              title: item['name'] as String,
-                              id: item['id'] as String,
-                              from: item['from'] as String,
-                              to: item['to'] as String,
-                              approvedBy: item['approvedBy'] as String,
-                              status: item['status'] as String,
-                              statusColor: item['status'] == 'Rejected'
-                                  ? Colors.red
-                                  : Colors.green,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                      child: SizedBox(
+                        height: 35,
+                        child: TextField(
+                          controller: _searchController,
+                          onChanged: (v) => setState(() => _query = v),
+                          decoration: InputDecoration(
+                            hintText: 'Search History',
+                            hintStyle: TextStyle(
+                              color: Colors.white.withOpacity(0.55),
+                              fontSize: 14,
                             ),
-                          );
-                        },
+                            filled: true,
+                            fillColor: const Color(0xFF1a2b5a),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.search,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 0,
+                            ),
+                          ),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
+                    ),
+                    Expanded(
+                      child: _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : filtered.isEmpty
+                              ? _buildEmptyState()
+                              : ListView.builder(
+                                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                                  physics: const BouncingScrollPhysics(),
+                                  itemCount: filtered.length,
+                                  itemBuilder: (context, index) {
+                                    final item = filtered[index];
+                                    String title = item['asset_name'] ?? 'Unknown';
+                                    String id = item['asset_id']?.toString() ?? 'Unknown';
+                                    String from = item['borrow_date'] ?? 'Unknown';
+                                    String to = item['return_date'] ?? 'Unknown';
+                                    String approvedBy = item['approved_by'] ?? 'Unknown'; // Assume field exists
+                                    String status = item['status'] ?? 'Approved';
+                                    Color statusColor = status == 'Rejected' ? Colors.red : Colors.green;
+                                    IconData icon = _getIconForTitle(title);
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 12),
+                                      child: _buildHistoryCard(
+                                        icon: icon,
+                                        title: title,
+                                        id: id,
+                                        from: from,
+                                        to: to,
+                                        approvedBy: approvedBy,
+                                        status: status,
+                                        statusColor: statusColor,
+                                      ),
+                                    );
+                                  },
+                                ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
