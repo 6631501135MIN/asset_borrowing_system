@@ -1,5 +1,6 @@
 // lib/screens/lecturer_login_screen.dart
 import 'package:flutter/material.dart';
+import 'package:asset_borrowing_system/services/api_service.dart';
 
 class LecturerLoginScreen extends StatefulWidget {
   const LecturerLoginScreen({super.key});
@@ -14,10 +15,12 @@ class _LecturerLoginScreenState extends State<LecturerLoginScreen> {
   final _passwordController = TextEditingController();
   final _passwordFocus = FocusNode();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   // WHY: Hold error messages rendered outside the input boxes.
   String? _usernameError;
   String? _passwordError;
+  String? _generalError;
 
   static const _bg = Color(0xFF0C1851);
   static const _boxFill = Color(0xFF081038);
@@ -34,7 +37,7 @@ class _LecturerLoginScreenState extends State<LecturerLoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     final form = _formKey.currentState;
     if (form == null) return;
 
@@ -51,12 +54,44 @@ class _LecturerLoginScreenState extends State<LecturerLoginScreen> {
     setState(() {
       _usernameError = userErr;
       _passwordError = passErr;
+      _generalError = null;
     });
 
     if (userErr != null || passErr != null) return;
 
-    if (!mounted) return;
-    Navigator.pushReplacementNamed(context, '/home');
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final String input = _usernameController.text.trim();
+      final String password = _passwordController.text;
+
+      Map<String, dynamic> result = await ApiService.login(
+        email: input.contains('@') ? input : null,
+        username: !input.contains('@') && !RegExp(r'^\d+$').hasMatch(input) ? input : null,
+        uid: RegExp(r'^\d+$').hasMatch(input) ? input : null,
+        password: password,
+      );
+
+      if (result['success']) {
+        // Assume data contains user info; check role if needed
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        setState(() {
+          _generalError = result['message'] ?? 'Login failed';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _generalError = 'Network error: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   // WHY: Guarantees the same box visual spec used in Setting screen.
@@ -178,31 +213,52 @@ class _LecturerLoginScreenState extends State<LecturerLoginScreen> {
                           ),
                         ),
 
+                      if (_generalError != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12.0),
+                          child: Text(
+                            _generalError!,
+                            style: const TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+
                       const SizedBox(height: 30), // was 28
                       // Login button with 1D2965 background
                       InkWell(
                         borderRadius: BorderRadius.circular(8),
-                        onTap: _handleLogin,
+                        onTap: _isLoading ? null : _handleLogin,
                         child: Ink(
                           width: 120,
                           decoration: _boxDecoration(context).copyWith(
                             color: const Color(0xFF1D2965), // updated color
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 12,
                             ),
                             child: Center(
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14, // reduced previously
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.6,
-                                ),
-                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14, // reduced previously
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.6,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
