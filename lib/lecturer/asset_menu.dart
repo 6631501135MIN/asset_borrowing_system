@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asset_borrowing_system/services/api_service.dart';
 
 class LecturerAssetMenu extends StatefulWidget {
   const LecturerAssetMenu({super.key});
@@ -9,6 +10,32 @@ class LecturerAssetMenu extends StatefulWidget {
 
 class _LecturerAssetMenuState extends State<LecturerAssetMenu> {
   int _selectedIndex = 0;
+
+  List<Map<String, dynamic>> _assetDetails = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAssetDetails();
+  }
+
+  Future<void> _fetchAssetDetails() async {
+    try {
+      // Assume categoryId for Macbook is 1; adjust based on actual category ID from backend
+      const int categoryId = 1; // Change this to the actual Macbook category ID
+      final List<Map<String, dynamic>> apiAssets = await ApiService.fetchAssetsByCategory(categoryId);
+      setState(() {
+        _assetDetails = apiAssets;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load asset details: $e')));
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -110,42 +137,41 @@ class _LecturerAssetMenuState extends State<LecturerAssetMenu> {
                       ),
                       const SizedBox(height: 12),
                       Expanded(
-                        child: ListView(
-                          padding: const EdgeInsets.all(16),
-                          children: [
-                            requestCard(
-                              icon: Icons.laptop_outlined,
-                              title: 'Macbook Pro M1',
-                              id: 'Mac-1',
-                              status: 'Available',
-                              statusColor: const Color.fromRGBO(76, 175, 80, 1),
-                            ),
-                            const SizedBox(height: 12),
-                            requestCard(
-                              icon: Icons.laptop_outlined,
-                              title: 'Macbook Pro',
-                              id: 'Mac-2',
-                              status: 'Pending',
-                              statusColor: const Color.fromARGB(255, 253, 244, 85),
-                            ),
-                            const SizedBox(height: 12),
-                            requestCard(
-                              icon: Icons.laptop_outlined,
-                              title: 'Macbook Pro',
-                              id: 'Mac-3',
-                              status: 'Disable',
-                              statusColor: const Color.fromARGB(255, 255, 64, 64),
-                            ),
-                            const SizedBox(height: 12),
-                            requestCard(
-                              icon: Icons.laptop_outlined,
-                              title: 'Macbook Air M2',
-                              id: 'Mac-4',
-                              status: 'Borrowed',
-                              statusColor: const Color(0xFFFFB020),
-                            ),
-                          ],
-                        ),
+                        child: _isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : ListView.separated(
+                                padding: const EdgeInsets.all(16),
+                                itemCount: _assetDetails.length,
+                                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                                itemBuilder: (context, i) {
+                                  final a = _assetDetails[i];
+                                  String title = a['asset_name'] ?? a['name'] ?? 'Unknown';
+                                  String id = a['asset_id']?.toString() ?? a['id']?.toString() ?? 'Unknown';
+                                  String status = a['status'] ?? 'Available';
+                                  Color statusColor;
+                                  switch (status.toLowerCase()) {
+                                    case 'pending':
+                                      statusColor = const Color.fromARGB(255, 253, 244, 85);
+                                      break;
+                                    case 'disable':
+                                    case 'disabled':
+                                      statusColor = const Color.fromARGB(255, 255, 64, 64);
+                                      break;
+                                    case 'borrowed':
+                                      statusColor = const Color(0xFFFFB020);
+                                      break;
+                                    default:
+                                      statusColor = const Color.fromRGBO(76, 175, 80, 1);
+                                  }
+                                  return requestCard(
+                                    icon: Icons.laptop_outlined,
+                                    title: title,
+                                    id: id,
+                                    status: status,
+                                    statusColor: statusColor,
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   ),
@@ -182,7 +208,7 @@ class _LecturerAssetMenuState extends State<LecturerAssetMenu> {
     required String status,
     required Color statusColor,
   }) {
-    Color backgroundColor = status.toLowerCase() == 'disable'
+    Color backgroundColor = (status.toLowerCase() == 'disable' || status.toLowerCase() == 'disabled')
         ? const Color.fromARGB(255, 100, 100, 100)
         : const Color(0xFF1a2b5a);
 
@@ -230,7 +256,7 @@ class _LecturerAssetMenuState extends State<LecturerAssetMenu> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$status',
+                  status,
                   style: TextStyle(
                     color: statusColor,
                     fontSize: 14,
