@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:asset_borrowing_system/lecturer/asset_menu.dart';
+import 'package:asset_borrowing_system/services/api_service.dart';
 
 class LecturerAssetList extends StatefulWidget {
   const LecturerAssetList({super.key});
@@ -13,14 +14,50 @@ class _LecturerAssetListState extends State<LecturerAssetList> {
 
   final TextEditingController _searchController = TextEditingController();
 
-  final List<_AssetItem> _assets = const [
-    _AssetItem(icon: Icons.laptop_outlined, title: 'Macbook', status: 'Available', statusColor: Colors.green),
-    _AssetItem(icon: Icons.tablet_mac_outlined, title: 'iPad', status: 'Available', statusColor: Colors.green),
-    _AssetItem(icon: Icons.sports_esports_outlined, title: 'Playstation', status: 'Available', statusColor: Colors.green),
-    _AssetItem(icon: Icons.vrpano_outlined, title: 'VR Headset', status: 'Disabled', statusColor: Colors.red),
-  ];
+  List<_AssetItem> _assets = [];
+  bool _isLoading = true;
 
   String _query = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAssets();
+  }
+
+  Future<void> _fetchAssets() async {
+    try {
+      final List<Map<String, dynamic>> apiAssets = await ApiService.fetchAssets();
+      setState(() {
+        _assets = apiAssets.map((a) {
+          String title = a['asset_name'] ?? a['name'] ?? 'Unknown';
+          String status = a['status'] ?? 'Available';
+          return _AssetItem(
+            icon: _getIconForTitle(title),
+            title: title,
+            status: status,
+            statusColor: status.toLowerCase() == 'disabled' ? Colors.red : Colors.green,
+          );
+        }).toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // Optionally show a snackbar or dialog for error
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load assets: $e')));
+    }
+  }
+
+  IconData _getIconForTitle(String title) {
+    String lowerTitle = title.toLowerCase();
+    if (lowerTitle.contains('macbook')) return Icons.laptop_outlined;
+    if (lowerTitle.contains('ipad')) return Icons.tablet_mac_outlined;
+    if (lowerTitle.contains('playstation')) return Icons.sports_esports_outlined;
+    if (lowerTitle.contains('vr')) return Icons.vrpano_outlined;
+    return Icons.device_unknown_outlined;
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -131,30 +168,33 @@ class _LecturerAssetListState extends State<LecturerAssetList> {
                     Expanded(
                       child: Stack(
                         children: [
-                          ListView.separated(
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
-                            itemCount: filtered.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 12),
-                            itemBuilder: (context, i) {
-                              final a = filtered[i];
-                              return GestureDetector(
-                                onTap: () {
-                                  if (a.title == 'Macbook') {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => const LecturerAssetMenu()),
-                                    );
-                                  }
-                                },
-                                child: _buildAssetCard(
-                                  icon: a.icon,
-                                  title: a.title,
-                                  status: a.status,
-                                  statusColor: a.statusColor,
-                                ),
-                              );
-                            },
-                          ),
+                          if (_isLoading)
+                            const Center(child: CircularProgressIndicator())
+                          else
+                            ListView.separated(
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 88),
+                              itemCount: filtered.length,
+                              separatorBuilder: (_, __) => const SizedBox(height: 12),
+                              itemBuilder: (context, i) {
+                                final a = filtered[i];
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (a.title == 'Macbook') {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (_) => const LecturerAssetMenu()),
+                                      );
+                                    }
+                                  },
+                                  child: _buildAssetCard(
+                                    icon: a.icon,
+                                    title: a.title,
+                                    status: a.status,
+                                    statusColor: a.statusColor,
+                                  ),
+                                );
+                              },
+                            ),
                           Positioned(
                             bottom: 16,
                             right: 16,
