@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:asset_borrowing_system/services/api_service.dart';
 
 class LendRequest extends StatefulWidget {
   const LendRequest({super.key});
@@ -9,6 +10,42 @@ class LendRequest extends StatefulWidget {
 
 class _LendRequestState extends State<LendRequest> {
   int _selectedIndex = 0;
+
+  List<Map<String, dynamic>> _requests = [];
+  bool _isLoading = true;
+  String _query = '';
+
+  final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _reasonController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRequests();
+  }
+
+  Future<void> _fetchRequests() async {
+    try {
+      final List<Map<String, dynamic>> apiRequests = await ApiService.fetchBorrowRequestsForLecturer();
+      setState(() {
+        _requests = apiRequests;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load requests: $e')));
+    }
+  }
+
+  IconData _getIconForTitle(String title) {
+    String lowerTitle = title.toLowerCase();
+    if (lowerTitle.contains('macbook')) return Icons.laptop_outlined;
+    if (lowerTitle.contains('ipad')) return Icons.tablet_mac_outlined;
+    if (lowerTitle.contains('vr')) return Icons.vrpano_outlined;
+    return Icons.device_unknown_outlined;
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -31,18 +68,27 @@ class _LendRequestState extends State<LendRequest> {
     }
   }
 
-  void _handleApprove(String assetName, String id) {
-    _showApproveDialog(
-      'Approved',
-      'Request for $assetName ($id) has been approved.',
-    );
+  Future<void> _handleApprove(int borrowingId, String assetName, String id) async {
+    final result = await ApiService.approveBorrowRequest(borrowingId);
+    if (result['success']) {
+      _showApproveDialog('Approved', 'Request for $assetName ($id) has been approved.');
+      _fetchRequests(); // Refresh list
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'])));
+    }
   }
 
-  void _handleReject(String assetName, String id) {
-    _showRejectDialog(
-      'Rejected',
-      'Request for $assetName ($id) has been rejected.',
-    );
+  Future<void> _handleReject(int borrowingId, String assetName, String id) async {
+    String? reason = await _showRejectReasonDialog();
+    if (reason != null && reason.isNotEmpty) {
+      final result = await ApiService.rejectBorrowRequest(borrowingId, reason);
+      if (result['success']) {
+        _showRejectDialog('Rejected', 'Request for $assetName ($id) has been rejected.');
+        _fetchRequests(); // Refresh list
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'])));
+      }
+    }
   }
 
   // ---------- Dialogs ----------
@@ -63,6 +109,33 @@ class _LendRequestState extends State<LendRequest> {
       circleBg: const Color(0xFFFFEBEE),
       accent: const Color(0xFFE53935),
       icon: Icons.cancel_rounded,
+    );
+  }
+
+  Future<String?> _showRejectReasonDialog() async {
+    _reasonController.clear();
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Reject Reason'),
+          content: TextField(
+            controller: _reasonController,
+            decoration: const InputDecoration(hintText: 'Enter reason for rejection'),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(null),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(ctx).pop(_reasonController.text),
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -156,7 +229,19 @@ class _LendRequestState extends State<LendRequest> {
   // ---------- End dialogs ----------
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final filtered = _requests.where((r) {
+      String title = r['asset_name'] ?? '';
+      return title.toLowerCase().contains(_query.toLowerCase());
+    }).toList();
+
     return Scaffold(
       backgroundColor: const Color(0xFF0C1851),
       body: SafeArea(
@@ -231,14 +316,15 @@ class _LendRequestState extends State<LendRequest> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
+                  child: Column(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(5),
                         child: SizedBox(
                           height: 35,
                           child: TextField(
+                            controller: _searchController,
+                            onChanged: (v) => setState(() => _query = v),
                             decoration: InputDecoration(
                               hintText: 'Search Asset',
                               hintStyle: TextStyle(
@@ -269,34 +355,34 @@ class _LendRequestState extends State<LendRequest> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      _buildRequestCard(
-                        icon: Icons.laptop_outlined,
-                        title: 'Macbook Air M3',
-                        id: 'Mac-1',
-                        from: '20 Nov 2025',
-                        to: '27 Nov 2025',
-                        status: 'Pending',
-                        statusColor: const Color(0xFFFFB020),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildRequestCard(
-                        icon: Icons.tablet_mac_outlined,
-                        title: 'iPad Pro M4',
-                        id: 'iPad-1',
-                        from: '20 Nov 2025',
-                        to: '21 Nov 2025',
-                        status: 'Rejected',
-                        statusColor: Colors.red,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildRequestCard(
-                        icon: Icons.vrpano_outlined,
-                        title: 'VR Headset',
-                        id: 'VR-1',
-                        from: '20 Nov 2025',
-                        to: '23 Nov 2025',
-                        status: 'Approved',
-                        statusColor: Colors.green,
+                      Expanded(
+                        child: _isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : ListView.separated(
+                                padding: EdgeInsets.zero,
+                                itemCount: filtered.length,
+                                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                                itemBuilder: (context, i) {
+                                  final r = filtered[i];
+                                  String title = r['asset_name'] ?? 'Unknown';
+                                  String id = r['asset_id']?.toString() ?? 'Unknown';
+                                  String from = r['borrow_date'] ?? 'Unknown';
+                                  String to = r['return_date'] ?? 'Unknown';
+                                  String status = r['status'] ?? 'Pending';
+                                  Color statusColor = const Color(0xFFFFB020); // Default pending
+                                  int borrowingId = r['borrowing_id'] ?? 0;
+                                  return _buildRequestCard(
+                                    icon: _getIconForTitle(title),
+                                    title: title,
+                                    id: id,
+                                    from: from,
+                                    to: to,
+                                    status: status,
+                                    statusColor: statusColor,
+                                    borrowingId: borrowingId,
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   ),
@@ -334,6 +420,7 @@ class _LendRequestState extends State<LendRequest> {
     required String to,
     required String status,
     required Color statusColor,
+    required int borrowingId,
   }) {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -404,7 +491,7 @@ class _LendRequestState extends State<LendRequest> {
               SizedBox(
                 height: 32,
                 child: ElevatedButton(
-                  onPressed: () => _handleApprove(title, id),
+                  onPressed: () => _handleApprove(borrowingId, title, id),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF22B14C),
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -427,7 +514,7 @@ class _LendRequestState extends State<LendRequest> {
               SizedBox(
                 height: 32,
                 child: ElevatedButton(
-                  onPressed: () => _handleReject(title, id),
+                  onPressed: () => _handleReject(borrowingId, title, id),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE53935),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
