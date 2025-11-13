@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:asset_borrowing_system/lecturer/lend_request.dart';
 import 'package:asset_borrowing_system/lecturer/lender_history.dart';
+import 'package:asset_borrowing_system/services/api_service.dart';
 
 // ========== Main Dashboard Screen ==========
 class Dashboard extends StatefulWidget {
@@ -15,6 +16,46 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   int _selectedIndex = 2; // Home is selected by default
+
+  Map<String, dynamic> _dashboardStats = {};
+  List<Map<String, dynamic>> _availableAssets = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDashboardData();
+  }
+
+  Future<void> _fetchDashboardData() async {
+    try {
+      final Map<String, dynamic> stats = await ApiService.fetchLecturerDashboard();
+      final List<Map<String, dynamic>> categories = await ApiService.fetchCategories();
+      setState(() {
+        _dashboardStats = stats;
+        _availableAssets = categories.where((c) {
+          // Assume categories have 'status' or filter available; here assuming all categories shown as 'available assets'
+          // If backend provides count per category, adjust accordingly
+          return true; // Or filter based on some field if needed
+        }).toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load dashboard: $e')));
+    }
+  }
+
+  IconData _getIconForLabel(String label) {
+    String lowerLabel = label.toLowerCase();
+    if (lowerLabel.contains('macbook')) return Icons.laptop_mac;
+    if (lowerLabel.contains('ipad')) return Icons.tablet_mac;
+    if (lowerLabel.contains('playstation')) return Icons.sports_esports;
+    if (lowerLabel.contains('vr')) return Icons.vrpano_outlined;
+    return Icons.device_unknown;
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -40,160 +81,158 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
+    String totalAssets = _dashboardStats['total_assets']?.toString() ?? '0';
+    String available = _dashboardStats['available']?.toString() ?? '0';
+    String disabled = _dashboardStats['disabled']?.toString() ?? '0';
+    String borrowed = _dashboardStats['borrowed']?.toString() ?? '0';
+
     return Scaffold(
       backgroundColor: const Color(0xFF0C1851),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Hello Aj.Surapong!',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Hello Aj.Surapong!',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.notifications_outlined,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                            onPressed: () {},
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.notifications_outlined,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                      onPressed: () {},
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                // Dashboard Title
-                const Center(
-                  child: Text(
-                    'Dashboard',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                    ),
+                      // Dashboard Title
+                      const Center(
+                        child: Text(
+                          'Dashboard',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Stat Cards Grid
+                      GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        childAspectRatio: 1.5,
+                        children: [
+                          StatCard(
+                            icon: Icons.inventory_2_outlined,
+                            value: totalAssets,
+                            label: 'Total Assets',
+                            iconColor: const Color(0xFF1A237E),
+                            iconBackground: const Color(0xFFE8EAF6),
+                            onTap: () {
+                              Navigator.pushNamed(context, '/assets');
+                            },
+                          ),
+                          StatCard(
+                            icon: Icons.check_circle_outline,
+                            value: available,
+                            label: 'Available',
+                            iconColor: const Color(0xFF2E7D32),
+                            iconBackground: const Color(0xFFE8F5E9),
+                          ),
+                          StatCard(
+                            icon: Icons.cancel_outlined,
+                            value: disabled,
+                            label: 'Disabled',
+                            iconColor: const Color(0xFFC62828),
+                            iconBackground: const Color(0xFFFFEBEE),
+                          ),
+                          StatCard(
+                            icon: Icons.arrow_forward,
+                            value: borrowed,
+                            label: 'Borrowed',
+                            iconColor: const Color(0xFFEF6C00),
+                            iconBackground: const Color(0xFFFFF3E0),
+                            onTap: () {
+                              Navigator.pushNamed(context, '/requests');
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Available Assets Section
+                      const Text(
+                        'Available Assets',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Assets List
+                      Column(
+                        children: List.generate(
+                          (_availableAssets.length / 2).ceil(),
+                          (index) {
+                            int start = index * 2;
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 24),
+                              child: Row(
+                                children: [
+                                  if (start < _availableAssets.length)
+                                    Expanded(
+                                      child: AssetItem(
+                                        icon: _getIconForLabel(_availableAssets[start]['name'] ?? 'Unknown'),
+                                        label: _availableAssets[start]['name'] ?? 'Unknown',
+                                      ),
+                                    ),
+                                  const SizedBox(width: 40),
+                                  if (start + 1 < _availableAssets.length)
+                                    Expanded(
+                                      child: AssetItem(
+                                        icon: _getIconForLabel(_availableAssets[start + 1]['name'] ?? 'Unknown'),
+                                        label: _availableAssets[start + 1]['name'] ?? 'Unknown',
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 32),
-
-                // Stat Cards Grid
-                GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 1.5,
-                  children: [
-                    StatCard(
-                      icon: Icons.inventory_2_outlined,
-                      value: '50',
-                      label: 'Total Assets',
-                      iconColor: const Color(0xFF1A237E),
-                      iconBackground: const Color(0xFFE8EAF6),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/assets');
-                      },
-                    ),
-                    const StatCard(
-                      icon: Icons.check_circle_outline,
-                      value: '30',
-                      label: 'Available',
-                      iconColor: Color(0xFF2E7D32),
-                      iconBackground: Color(0xFFE8F5E9),
-                    ),
-                    const StatCard(
-                      icon: Icons.cancel_outlined,
-                      value: '5',
-                      label: 'Disabled',
-                      iconColor: Color(0xFFC62828),
-                      iconBackground: Color(0xFFFFEBEE),
-                    ),
-                    StatCard(
-                      icon: Icons.arrow_forward,
-                      value: '15',
-                      label: 'Borrowed',
-                      iconColor: const Color(0xFFEF6C00),
-                      iconBackground: const Color(0xFFFFF3E0),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/requests');
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-
-                // Available Assets Section
-                const Text(
-                  'Available Assets',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Assets List
-                const Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AssetItem(
-                            icon: Icons.laptop_mac,
-                            label: 'Macbook',
-                          ),
-                        ),
-                        SizedBox(width: 40),
-                        Expanded(
-                          child: AssetItem(
-                            icon: Icons.tablet_mac,
-                            label: 'iPad',
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 24),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AssetItem(
-                            icon: Icons.sports_esports,
-                            label: 'PlayStation',
-                          ),
-                        ),
-                        SizedBox(width: 40),
-                        Expanded(
-                          child: AssetItem(
-                            icon: Icons.vrpano_outlined,
-                            label: 'VR Headset',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
